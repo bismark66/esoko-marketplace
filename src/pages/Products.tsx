@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Filter } from 'lucide-react';
 import ProductFilters from '../components/ProductFilters';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 // Sample product data - in a real app this would come from an API
 const products = {
@@ -97,6 +99,10 @@ const products = {
 export default function Products() {
   const [activeCategory, setActiveCategory] = useState<'all' | 'grains' | 'livestock' | 'produce'>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const [notification, setNotification] = useState('');
   
   // Get all products
   const allProducts = Object.values(products).flat();
@@ -105,6 +111,28 @@ export default function Products() {
   const displayedProducts = activeCategory === 'all' 
     ? allProducts 
     : products[activeCategory as keyof typeof products];
+
+    const handleAddToCart = (product: Product) => {
+      if (!isAuthenticated) {
+        navigate('/signin', { state: { from: '/products' } });
+        return;
+      }
+  
+      addToCart({
+        id: product.id,
+        title: product.name,
+        price: product.discountedPrice,
+        image: product.imageUrl
+      });
+      
+      // Show notification
+      setNotification(`${product.name} added to cart!`);
+      setTimeout(() => setNotification(''), 3000);
+    };
+  
+    const handleViewDetails = (productId: string) => {
+      navigate(`/product/${productId}`);
+    };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -118,7 +146,7 @@ export default function Products() {
         <div className="relative flex-1 max-w-md">
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search products,inputs,fertilizers..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
@@ -181,8 +209,14 @@ export default function Products() {
               <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
                 {product.name}
               </h3>
-              <p className="text-blue-600 font-medium mt-1">
-                ${product.price}/{product.unit}
+              <p className="text-blue-600 font-medium mt-1 flex items-center justify-between">
+                <div className='flex-1'>${product.price}/{product.unit}</div>
+                <button
+                    // onClick={() => handleAddToCart(product)}
+                    className="flex-1 bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
+                  >
+                    Add to Cart
+                  </button>
               </p>
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-sm text-gray-500">{product.seller.name}</span>
