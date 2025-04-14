@@ -38,7 +38,7 @@ export default function Hero() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Search for grains, livestock, or produce..."
+              placeholder="Search for grains, livestock, or inputs..."
               className="w-full px-6 py-4 rounded-full text-gray-900 text-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
             />
             <button 
