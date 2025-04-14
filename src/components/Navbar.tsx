@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, LogIn, LogOut } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, LogIn, LogOut, } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,7 +25,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="text-2xl font-bold text-[#2E8B57]">
-              Esoko
+              Esoko MarketPlace
             </Link>
           </div>
 
@@ -99,7 +99,7 @@ export default function Navbar() {
                 to="/signin"
                 className="flex items-center text-gray-700 hover:text-[#2E8B57]"
               >
-                <LogIn className="h-5 w-5 mr-2" />
+                <User className="h-5 w-5 mr-2" />
                 <span>Sign In</span>
               </Link>
             )}
