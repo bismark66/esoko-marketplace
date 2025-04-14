@@ -31,7 +31,7 @@ export default function ProductFilters({ onFilterChange }: FilterProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="space-y-6">
-        <div className="relative">
+        {/* <div className="relative">
           <input
             type="text"
             placeholder="Search products..."
@@ -40,7 +40,7 @@ export default function ProductFilters({ onFilterChange }: FilterProps) {
             onChange={(e) => handleFilterChange('search', e.target.value)}
           />
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-        </div>
+        </div> */}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
