@@ -15,7 +15,7 @@ A modern, high-performance e-commerce solution built with Vite.
 
 - Vite
 - CSS with optional Tailwind integration
-  Backend integration (specify your backend technology)
+- Backend integration (....)
 
 ## Getting Started
 
