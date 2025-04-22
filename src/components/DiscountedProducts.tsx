@@ -15,56 +15,62 @@ interface Product {
 
 const DiscountedProducts = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { dispatch } = useCart();
   const { isAuthenticated } = useAuth();
-  const [notification, setNotification] = useState('');
+  const [notification, setNotification] = useState("");
 
   const discountedProducts: Product[] = [
     {
-      id: 'd1',
-      name: 'Fresh Tomatoes',
+      id: "d1",
+      name: "Fresh Tomatoes",
       originalPrice: 120,
       discountedPrice: 90,
-      unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1592841200221-1907caa581f7?auto=format&fit=crop&q=80',
-      discount: '25%'
+      unit: "kg",
+      imageUrl:
+        "https://images.unsplash.com/photo-1592841200221-1907caa581f7?auto=format&fit=crop&q=80",
+      discount: "25%",
     },
     {
-      id: 'd2',
-      name: 'Organic Potatoes',
+      id: "d2",
+      name: "Organic Potatoes",
       originalPrice: 80,
       discountedPrice: 64,
-      unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&q=80',
-      discount: '20%'
+      unit: "kg",
+      imageUrl:
+        "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&q=80",
+      discount: "20%",
     },
     {
-      id: 'd3',
-      name: 'Premium Rice',
+      id: "d3",
+      name: "Premium Rice",
       originalPrice: 150,
       discountedPrice: 120,
-      unit: 'kg',
-      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
-      discount: '20%'
-    }
+      unit: "kg",
+      imageUrl:
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
+      discount: "20%",
+    },
   ];
 
   const handleAddToCart = (product: Product) => {
     if (!isAuthenticated) {
-      navigate('/signin', { state: { from: '/products' } });
+      navigate("/signin", { state: { from: "/products" } });
       return;
     }
 
-    addToCart({
-      id: product.id,
-      title: product.name,
-      price: product.discountedPrice,
-      image: product.imageUrl
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: product.id,
+        title: product.name,
+        price: product.discountedPrice,
+        image: product.imageUrl,
+      },
     });
-    
+
     // Show notification
     setNotification(`${product.name} added to cart!`);
-    setTimeout(() => setNotification(''), 3000);
+    setTimeout(() => setNotification(""), 3000);
   };
 
   const handleViewDetails = (productId: string) => {
