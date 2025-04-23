@@ -61,7 +61,8 @@ yarn dev
  *   rendered on the page. This is useful for making API calls to fetch data
  *   that should be displayed on the page.
  * @example
- ``` {
+ ```
+ {
     path: "/",
     element: <Home />,
     exact: true,
