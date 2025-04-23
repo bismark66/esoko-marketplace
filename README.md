@@ -22,16 +22,17 @@ A modern, high-performance e-commerce solution built with Vite.
 ### Prerequisites
 
 Node.js (v16+)
+
 npm or yarn
 
 ## Installation
 
 ```
 # Clone the repository
-git clone https://github.com/yourusername/vite-ecommerce.git
+git clone git@github.com:esoko-ghana/esoko-marketplace.git
 
 # Navigate to project directory
-cd vite-ecommerce
+cd /project-directory
 
 # Install dependencies
 npm install
