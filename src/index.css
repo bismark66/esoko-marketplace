@@ -26,3 +26,92 @@
 .animate-fade-in-out {
     animation: fadeInOut 3s ease-in-out;
 }
+
+/* AppLoader animations from Uiverse */
+
+@keyframes loader-text {
+    0% {
+      letter-spacing: 1px;
+      transform: translateX(0px);
+    }
+    40% {
+      letter-spacing: 2px;
+      transform: translateX(26px);
+    }
+    80% {
+      letter-spacing: 1px;
+      transform: translateX(32px);
+    }
+    90% {
+      letter-spacing: 2px;
+      transform: translateX(0px);
+    }
+    100% {
+      letter-spacing: 1px;
+      transform: translateX(0px);
+    }
+  }
+  
+  @keyframes loader-bar {
+    0% {
+      width: 16px;
+      transform: translateX(0px);
+    }
+    40% {
+      width: 100%;
+      transform: translateX(0px);
+    }
+    80% {
+      width: 16px;
+      transform: translateX(64px);
+    }
+    90% {
+      width: 100%;
+      transform: translateX(0px);
+    }
+    100% {
+      width: 16px;
+      transform: translateX(0px);
+    }
+  }
+  
+  @keyframes loader-bar-inner {
+    0% {
+      transform: translateX(0px);
+      width: 16px;
+    }
+    40% {
+      transform: translateX(0%);
+      width: 80%;
+    }
+    80% {
+      width: 100%;
+      transform: translateX(0px);
+    }
+    90% {
+      width: 80%;
+      transform: translateX(15px);
+    }
+    100% {
+      transform: translateX(0px);
+      width: 16px;
+    }
+  }
+  
+  .animate-loader-text {
+    animation: loader-text 3.5s ease infinite;
+  }
+  
+  .animate-loader-bar {
+    animation: loader-bar 3.5s ease infinite;
+  }
+  
+  .animate-loader-bar-inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: #D1C2FF;
+    border-radius: 9999px;
+    animation: loader-bar-inner 3.5s ease infinite;
+  }
+  

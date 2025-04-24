@@ -45,3 +45,27 @@ npm run dev
 yarn dev
 
 ```
+
+# Code Level Documentation 
+
+### Routing
+
+* @file routerConfig.tsx
+ * @description This file exports an array of route definitions for the entire app.
+ * Each route definition is an object with the following properties:
+ * - path: The path of the route.
+ * - element: The component to render on the route.
+ * - exact: Whether the route is an exact match.
+ * - loader: A function that is called when the route is first loaded. The
+ *   function should return a promise that resolves to a string that will be
+ *   rendered on the page. This is useful for making API calls to fetch data
+ *   that should be displayed on the page.
+ * @example
+ ```
+ {
+    path: "/",
+    element: <Home />,
+    exact: true,
+    loader: () => fetch("https://example.com/api/data").then(res => res.text()),
+  }
+ ```
