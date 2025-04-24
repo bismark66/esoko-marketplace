@@ -21,7 +21,7 @@
     "noFallthroughCasesInSwitch": true,
 
     // Import aliase
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
