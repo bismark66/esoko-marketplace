@@ -34,6 +34,7 @@ const routerConfig = [
     path: "/cart",
     element: <Cart />,
     exact: () => "",
+    loader: () => "",
   },
   {
     path: "/checkout",
