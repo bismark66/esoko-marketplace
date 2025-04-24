@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, Truck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import ImageCarousel from "../components/ImageCarousel";
 
 interface Product {
   id: string;
@@ -18,107 +19,125 @@ interface Product {
 
 const products: Record<string, Product> = {
   // Regular products
-  '1': {
-    id: '1',
-    title: 'Premium Organic Coffee',
-    description: 'High-quality organic coffee beans from sustainable farms. Perfect for coffee enthusiasts who appreciate rich flavor and ethical sourcing.',
+  "1": {
+    id: "1",
+    title: "Premium Organic Coffee",
+    description:
+      "High-quality organic coffee beans from sustainable farms. Perfect for coffee enthusiasts who appreciate rich flavor and ethical sourcing.",
     price: 1200,
-    image: 'https://images.unsplash.com/photo-1541692641319-98172eda766f?auto=format&fit=crop&q=80',
-    category: 'Beverages',
+    image:
+      "https://images.unsplash.com/photo-1541692641319-98172eda766f?auto=format&fit=crop&q=80",
+    category: "Beverages",
     rating: 4.8,
     reviews: 120,
-    inStock: true
+    inStock: true,
   },
-  '2': {
-    id: '2',
-    title: 'Fresh Organic Vegetables',
-    description: 'Locally sourced organic vegetables, freshly harvested and packed with nutrients. Perfect for healthy meals and snacks.',
+  "2": {
+    id: "2",
+    title: "Fresh Organic Vegetables",
+    description:
+      "Locally sourced organic vegetables, freshly harvested and packed with nutrients. Perfect for healthy meals and snacks.",
     price: 800,
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80',
-    category: 'Produce',
+    image:
+      "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80",
+    category: "Produce",
     rating: 4.6,
     reviews: 95,
-    inStock: true
+    inStock: true,
   },
-  '3': {
-    id: '3',
-    title: 'Artisanal Bread',
-    description: 'Handcrafted bread made with organic flour and natural ingredients. Perfect for sandwiches or as a side to your meals.',
+  "3": {
+    id: "3",
+    title: "Artisanal Bread",
+    description:
+      "Handcrafted bread made with organic flour and natural ingredients. Perfect for sandwiches or as a side to your meals.",
     price: 600,
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80',
-    category: 'Bakery',
+    image:
+      "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80",
+    category: "Bakery",
     rating: 4.7,
     reviews: 85,
-    inStock: true
+    inStock: true,
   },
   // Discounted products
-  'd1': {
-    id: 'd1',
-    title: 'Organic Rice',
-    description: 'Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.',
+  d1: {
+    id: "d1",
+    title: "Organic Rice",
+    description:
+      "Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.",
     price: 950,
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
-    category: 'Grains',
+    image:
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
+    category: "Grains",
     rating: 4.5,
     reviews: 75,
-    inStock: true
+    inStock: true,
   },
-  'd2': {
-    id: 'd2',
-    title: 'Fresh Dairy Milk',
-    description: 'Fresh, pasteurized milk from grass-fed cows. Rich in calcium and essential nutrients.',
+  d2: {
+    id: "d2",
+    title: "Fresh Dairy Milk",
+    description:
+      "Fresh, pasteurized milk from grass-fed cows. Rich in calcium and essential nutrients.",
     price: 450,
-    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&q=80',
-    category: 'Dairy',
+    image:
+      "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&q=80",
+    category: "Dairy",
     rating: 4.4,
     reviews: 60,
-    inStock: true
+    inStock: true,
   },
-  'd3': {
-    id: 'd3',
-    title: 'Organic Honey',
-    description: 'Pure, raw honey from local beekeepers. Natural sweetener with numerous health benefits.',
+  d3: {
+    id: "d3",
+    title: "Organic Honey",
+    description:
+      "Pure, raw honey from local beekeepers. Natural sweetener with numerous health benefits.",
     price: 750,
-    image: 'https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&q=80',
-    category: 'Sweeteners',
+    image:
+      "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&q=80",
+    category: "Sweeteners",
     rating: 4.9,
     reviews: 110,
-    inStock: true
+    inStock: true,
   },
   // Weekly offers
-  'w1': {
-    id: 'w1',
-    title: 'Bulk Corn Supply',
-    description: 'High-quality corn supply for wholesale buyers. Perfect for food processing and animal feed.',
+  w1: {
+    id: "w1",
+    title: "Bulk Corn Supply",
+    description:
+      "High-quality corn supply for wholesale buyers. Perfect for food processing and animal feed.",
     price: 280,
-    image: 'https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80',
-    category: 'Grains',
+    image:
+      "https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80",
+    category: "Grains",
     rating: 4.3,
     reviews: 45,
-    inStock: true
+    inStock: true,
   },
-  'w2': {
-    id: 'w2',
-    title: 'Fresh Dairy Cattle',
-    description: 'Healthy dairy cattle for farm expansion. Vaccinated and ready for production.',
+  w2: {
+    id: "w2",
+    title: "Fresh Dairy Cattle",
+    description:
+      "Healthy dairy cattle for farm expansion. Vaccinated and ready for production.",
     price: 1800,
-    image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80',
-    category: 'Livestock',
+    image:
+      "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80",
+    category: "Livestock",
     rating: 4.7,
     reviews: 30,
-    inStock: true
+    inStock: true,
   },
-  'w3': {
-    id: 'w3',
-    title: 'Organic Rice',
-    description: 'Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.',
+  w3: {
+    id: "w3",
+    title: "Organic Rice",
+    description:
+      "Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.",
     price: 950,
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
-    category: 'Grains',
+    image:
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
+    category: "Grains",
     rating: 4.5,
     reviews: 75,
-    inStock: true
-  }
+    inStock: true,
+  },
 };
 
 export default function ProductDetail() {
@@ -127,17 +146,21 @@ export default function ProductDetail() {
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
   const [quantity, setQuantity] = useState(1);
-  const [notification, setNotification] = useState('');
+  const [notification, setNotification] = useState("");
 
   const product = id ? products[id] : null;
 
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-        <p className="text-gray-600 mb-8">The product you're looking for doesn't exist or has been removed.</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Product Not Found
+        </h1>
+        <p className="text-gray-600 mb-8">
+          The product you're looking for doesn't exist or has been removed.
+        </p>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/products")}
           className="bg-[#2E8B57] text-white px-6 py-3 rounded-md hover:bg-[#256F3A] transition-colors"
         >
           Return to Home
@@ -148,7 +171,7 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
-      navigate('/signin', { state: { from: `/product/${id}` } });
+      navigate("/signin", { state: { from: `/product/${id}` } });
       return;
     }
 
@@ -156,12 +179,12 @@ export default function ProductDetail() {
       id: product.id,
       title: product.title,
       price: product.price,
-      image: product.image
+      image: product.image,
     });
-    
+
     // Show notification
     setNotification(`${product.title} added to cart!`);
-    setTimeout(() => setNotification(''), 3000);
+    setTimeout(() => setNotification(""), 3000);
   };
 
   return (
@@ -175,18 +198,21 @@ export default function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="w-full h-96 object-cover"
-          />
-        </div>
+        {/* <div className="bg-white rounded-lg shadow-md overflow-hidden"> */}
+        <ImageCarousel
+          images={[product.image]}
+          title={product.title}
+          containerClassName="bg-white rounded-lg shadow-md overflow-hidden"
+          imageContainerClassName="w-full h-96 relative"
+        />
+        {/* </div> */}
 
         {/* Product Details */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {product.title}
+            </h1>
             <div className="flex items-center mt-2">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
@@ -194,8 +220,8 @@ export default function ProductDetail() {
                     key={i}
                     className={`w-5 h-5 ${
                       i < Math.floor(product.rating)
-                        ? 'text-yellow-400 fill-current'
-                        : 'text-gray-300'
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -206,7 +232,9 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <p className="text-2xl font-bold text-[#2E8B57]">₵{product.price.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-[#2E8B57]">
+            ₵{product.price.toFixed(2)}
+          </p>
 
           <p className="text-gray-600">{product.description}</p>
 
@@ -245,11 +273,12 @@ export default function ProductDetail() {
             <h2 className="text-lg font-semibold mb-2">Product Details</h2>
             <ul className="space-y-2 text-gray-600">
               <li>
-                <span className="font-medium">Category:</span> {product.category}
+                <span className="font-medium">Category:</span>{" "}
+                {product.category}
               </li>
               <li>
-                <span className="font-medium">Availability:</span>{' '}
-                {product.inStock ? 'In Stock' : 'Out of Stock'}
+                <span className="font-medium">Availability:</span>{" "}
+                {product.inStock ? "In Stock" : "Out of Stock"}
               </li>
             </ul>
           </div>
