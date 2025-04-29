@@ -1,3 +1,4 @@
+import { setAccessToken } from "@/utils/helpers";
 import React, {
   createContext,
   useContext,
@@ -83,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         name: email.split("@")[0],
       };
-
+      // setAccessToken(response.accessToken);
       localStorage.setItem("user", JSON.stringify(userData));
       dispatch({ type: "LOGIN", payload: userData });
     } catch (error) {
