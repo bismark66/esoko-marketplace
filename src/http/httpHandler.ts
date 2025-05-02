@@ -7,6 +7,7 @@ import {
   RegisterUserResponse,
   EmailVerifyType,
   ApiError,
+  CreateUser,
 } from "@/types";
 import { setAccessToken, setRefreshToken } from "@/utils/helpers";
 import { http } from "./httpInstance";
@@ -14,17 +15,10 @@ import { http } from "./httpInstance";
 export const authHandlers = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
     try {
-      const response = await http.post<LoginResponse>("/login", payload);
-
-      // Set tokens for future requests
-      // setAccessToken(response.accessToken);
-      // setRefreshToken(response.refreshToken);
-
+      const response = await http.post<LoginResponse>("/auth/login", payload);
       return response;
     } catch (error) {
-      // Convert the error to a standardized format
       const apiError = error as ApiError;
-      console.error("Login error:", apiError);
       throw apiError; // Re-throw for react-query to handle
     }
   },
@@ -39,9 +33,12 @@ export const authHandlers = {
     setRefreshToken(refreshToken);
     return accessToken;
   },
-  register: async (payload: User): Promise<RegisterUserResponse> => {
+  register: async (payload: CreateUser): Promise<RegisterUserResponse> => {
     try {
-      const response = await http.post<RegisterUserResponse>("/auth", payload);
+      const response = await http.post<RegisterUserResponse>(
+        "/auth/register",
+        payload
+      );
       return response;
     } catch (error) {
       // Convert the error to a standardized format
