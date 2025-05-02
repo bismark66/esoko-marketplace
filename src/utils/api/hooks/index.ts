@@ -5,7 +5,7 @@ import {
   loginMutationFn,
   signUpMutationFn,
 } from "@/utils/api/queryfns";
-import type { LoginRequest } from "@/types";
+import type { CreateUser, LoginRequest } from "@/types";
 
 export const useLogin = () => {
   return useMutation({
@@ -34,7 +34,7 @@ export const useProfile = () => {
 export const useSignUp = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation({
-    mutationFn: async (payload: any) => await signUpMutationFn(payload),
+    mutationFn: async (payload: CreateUser) => await signUpMutationFn(payload),
     onSuccess: (data) => {
       console.log("Signed up!", data.user);
       return data;
