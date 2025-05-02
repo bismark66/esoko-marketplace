@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { UserPlus } from 'lucide-react';
+import { useAuth } from "../context/AuthContext";
+import { UserPlus } from "lucide-react";
 import { useSignUp } from "@/utils/api/hooks";
+import { useLogin } from "@/utils/api/hooks";
+import { setAccessToken, setUser } from "@/utils/helpers";
+import { Modal } from "@/components/Modal";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -15,8 +18,9 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, dispatch } = useAuth();
   const { mutate, isLoading } = useSignUp();
+  const { mutate: loginMutate } = useLogin();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,8 +37,8 @@ export default function SignUp() {
 
     mutate(
       {
-        firstName: "Bismark",
-        lastName: "Bismark",
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
       },
@@ -47,7 +51,30 @@ export default function SignUp() {
             setLoading(false);
             return;
           }
-          await login(formData.email, formData.password);
+
+          // Simulate successful registration and login
+          // if(data) {return <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+          //   <h2>Account Created</h2>
+          //   <p>Your account has been created successfully!</p>
+          // </Modal>}
+          // await login(formData.email, formData.password);
+          loginMutate(
+            { email: formData.email, password: formData.password },
+            {
+              onSuccess: (data) => {
+                console.log("Logged in!", data);
+                setAccessToken(data.accessToken);
+                setUser(data);
+                dispatch({ type: "LOGIN", payload: data });
+                dispatch({ type: "SET_USER", payload: data.user });
+                // navigate(from, { replace: true });
+              },
+              onError: (error) => {
+                console.error("Login error:", error.message);
+                setError("Invalid email or password");
+              },
+            }
+          );
           navigate("/");
           setLoading(false);
         },
@@ -65,18 +92,18 @@ export default function SignUp() {
       return;
     }
 
-    try {
-      // TODO: Implement actual registration logic
-      console.log("Registering user:", formData);
+    // try {
+    //   // TODO: Implement actual registration logic
+    //   console.log("Registering user:", formData);
 
-      // Simulate successful registration and login
-      await login(formData.email, formData.password);
-      navigate("/");
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    //   // Simulate successful registration and login
+    //   await login(formData.email, formData.password);
+    //   navigate("/");
+    // } catch (err) {
+    //   setError("Registration failed. Please try again.");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
