@@ -2,9 +2,9 @@
 import { getAccessToken } from "../utils/helpers";
 import { handleHttpResponse } from "./httpResponse";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
-
+// const API_BASE_URL =
+//   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+const API_BASE_URL ="https://7b49-154-161-17-27.ngrok-free.app/v1"
 class HttpClient {
   private async request<T, B = unknown>(
     path: string,
