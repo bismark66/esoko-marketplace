@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
 import { useLogin } from "@/utils/api/hooks";
+import { setAccessToken, getAccessToken, setUser } from "@/utils/helpers";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -11,8 +12,9 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
-  const { mutate, isPending, error } = useLogin();
+  const { login, dispatch } = useAuth();
+  const { mutate, isPending, isError } = useLogin();
+  // const { dispatch } = useAuth();
 
   const from = location.state?.from?.pathname || "/";
 
@@ -26,7 +28,10 @@ export default function SignIn() {
       {
         onSuccess: (data) => {
           console.log("Logged in!", data);
-          // dispatch({ type: "LOGIN", payload: response.data.user });
+          setAccessToken(data.accessToken);
+          setUser(data);
+          dispatch({ type: "LOGIN", payload: data });
+          dispatch({ type: "SET_USER", payload: data.user });
           navigate(from, { replace: true });
         },
         onError: (err) => {
@@ -37,26 +42,26 @@ export default function SignIn() {
     );
     // const response = await login(email, password);
 
-    try {
-      await login(email, password);
+    //   try {
+    //     await login(email, password);
 
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError("Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
+    //     navigate(from, { replace: true });
+    //   } catch (err) {
+    //     setError("Invalid email or password");
+    //   } finally {
+    //     setLoading(false);
+    //   }
   };
 
-  // if(isPending) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-  //     </div>
-  //   )
-  // }
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
-  if (error) throw new Error(error);
+  // if (error) throw new Error(error);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -81,9 +86,10 @@ export default function SignIn() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
+            {isError && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-                {error}
+                {/* {isError} */}
+                <p className="text-sm">There was an Error logging In!</p>
               </div>
             )}
 
@@ -224,8 +230,4 @@ export default function SignIn() {
       </div>
     </div>
   );
-}
-
-function dispatch(arg0: { type: string; payload: any }) {
-  throw new Error("Function not implemented.");
 }
