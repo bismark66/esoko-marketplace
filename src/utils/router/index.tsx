@@ -65,7 +65,7 @@ const routerConfig = [
     element: <Profile />,
     exact: true,
     loader: () => "",
-    protected: true,
+    protected: false,
   },
   {
     path: "/contact",
