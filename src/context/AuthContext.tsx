@@ -1,4 +1,4 @@
-import { setAccessToken } from "@/utils/helpers";
+import { getAccessToken, getUser, setAccessToken } from "@/utils/helpers";
 import React, {
   createContext,
   useContext,
@@ -6,97 +6,132 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-
-// Types
-interface DeviceType {
-  model: string;
-  deviceOSVersion: string;
-  platform: string;
-}
-
-interface UserType {
-  email: string;
-  name: string;
-  deviceId?: string;
-  deviceInfo?: DeviceType;
-}
+import { LoginResponse, User } from "@/types";
+// import { get } from "http";
+// import { User } from "lucide-react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: UserType | null;
+  user: LoginResponse | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  error?: string;
+  dispatch: React.Dispatch<AuthAction>; // Now required
 }
 
 type AuthAction =
-  | { type: "LOGIN"; payload: UserType }
+  | { type: "LOGIN"; payload: LoginResponse }
   | { type: "LOGOUT" }
-  | { type: "SET_USER"; payload: UserType | null }
-  | { type: "RESET" };
+  | { type: "SET_ERROR"; payload: string }
+  | { type: "CLEAR_ERROR" }
+  | { type: "SET_USER"; payload: User | null };
 
-// Initial State
-const initialState: Omit<AuthContextType, "login" | "logout"> = {
+const initialState: {
+  isAuthenticated: boolean;
+  user: LoginResponse | null;
+  error?: string;
+  userProfile: User | null;
+} = {
   isAuthenticated: false,
   user: null,
+  error: undefined,
+  userProfile: null,
 };
 
-// Reducer
 const authReducer = (
-  state: typeof initialState,
+  state = initialState,
   action: AuthAction
 ): typeof initialState => {
   switch (action.type) {
     case "LOGIN":
-      return { ...state, isAuthenticated: true, user: action.payload };
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload,
+        error: undefined,
+      };
     case "LOGOUT":
-    case "RESET":
-      return { ...state, isAuthenticated: false, user: null };
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        error: undefined,
+      };
+    case "SET_ERROR":
+      return { ...state, error: action.payload };
+    case "CLEAR_ERROR":
+      return { ...state, error: undefined };
     case "SET_USER":
-      return { ...state, user: action.payload };
+      return { ...state, userProfile: action.payload };
     default:
       return state;
   }
 };
 
-// Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser: UserType = JSON.parse(storedUser);
-      dispatch({ type: "LOGIN", payload: parsedUser });
-    }
+    const initializeAuth = () => {
+      try {
+        // const token = localStorage.getItem("accessToken");
+        // const user = localStorage.getItem("user");
+        const token = getAccessToken();
+        const user = getUser();
+
+        if (token && user) {
+          const parsedUser = JSON.parse(user) as User;
+          if (parsedUser?.email) {
+            // Basic validation
+            dispatch({ type: "LOGIN", payload: parsedUser });
+          }
+        }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        dispatch({ type: "SET_ERROR", payload: "Failed to load user session" });
+      }
+    };
+
+    initializeAuth();
   }, []);
 
-  // login
   const login = async (email: string, password: string) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      dispatch({ type: "CLEAR_ERROR" });
 
-      const userData: UserType = {
-        email,
-        name: email.split("@")[0],
-      };
-      // setAccessToken(response.accessToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-      dispatch({ type: "LOGIN", payload: userData });
+      // Replace with actual API call
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data: LoginResponse = await response.json();
+
+      setAccessToken(data.accessToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      dispatch({ type: "LOGIN", payload: data.user });
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login error:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: error instanceof Error ? error.message : "Login failed",
+      });
       throw error;
     }
   };
 
-  // logout
   const logout = () => {
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
-    localStorage.removeItem("cart"); // also clears cart
+    localStorage.removeItem("cart");
     dispatch({ type: "LOGOUT" });
   };
 
@@ -107,6 +142,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user: state.user,
         login,
         logout,
+        error: state.error,
+        dispatch,
       }}
     >
       {children}
@@ -114,7 +151,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
