@@ -17,41 +17,45 @@ interface WeeklyOffer {
 
 const WeeklyOffers = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { dispatch } = useCart();
   const { isAuthenticated } = useAuth();
-  const [notification, setNotification] = useState('');
+  const [notification, setNotification] = useState("");
+  // Removed destructuring as dispatch is a function
 
   const weeklyOffers: WeeklyOffer[] = [
     {
-      id: 'w1',
-      name: 'Bulk Corn Supply',
+      id: "w1",
+      name: "Bulk Corn Supply",
       originalPrice: 280,
       offerPrice: 245,
-      unit: 'ton',
-      imageUrl: 'https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80',
-      validUntil: '2024-03-20',
-      savings: '12%'
+      unit: "ton",
+      imageUrl:
+        "https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80",
+      validUntil: "2024-03-20",
+      savings: "12%",
     },
     {
-      id: 'w2',
-      name: 'Fresh Dairy Cattle',
+      id: "w2",
+      name: "Fresh Dairy Cattle",
       originalPrice: 1800,
       offerPrice: 1620,
-      unit: 'head',
-      imageUrl: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80',
-      validUntil: '2024-03-22',
-      savings: '10%'
+      unit: "head",
+      imageUrl:
+        "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80",
+      validUntil: "2024-03-22",
+      savings: "10%",
     },
     {
-      id: 'w3',
-      name: 'Organic Rice',
+      id: "w3",
+      name: "Organic Rice",
       originalPrice: 950,
       offerPrice: 807,
-      unit: 'ton',
-      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80',
-      validUntil: '2024-03-25',
-      savings: '15%'
-    }
+      unit: "ton",
+      imageUrl:
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
+      validUntil: "2024-03-25",
+      savings: "15%",
+    },
   ];
 
   const handleViewDetails = (offerId: string) => {
@@ -60,20 +64,23 @@ const WeeklyOffers = () => {
 
   const handleAddToCart = (offer: WeeklyOffer) => {
     if (!isAuthenticated) {
-      navigate('/signin', { state: { from: '/' } });
+      navigate("/signin", { state: { from: "/" } });
       return;
     }
 
-    addToCart({
-      id: offer.id,
-      title: offer.name,
-      price: offer.offerPrice,
-      image: offer.imageUrl
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: offer.id,
+        title: offer.name,
+        price: offer.offerPrice,
+        image: offer.imageUrl,
+      },
     });
-    
+
     // Show notification
     setNotification(`${offer.name} added to cart!`);
-    setTimeout(() => setNotification(''), 3000);
+    setTimeout(() => setNotification(""), 3000);
   };
 
   return (
@@ -85,20 +92,22 @@ const WeeklyOffers = () => {
             {notification}
           </div>
         )}
-      
+
         <div className="flex items-center gap-3 mb-8">
           <Calendar className="w-8 h-8 text-[#2E8B57]" />
-          <h2 className="text-3xl font-bold text-gray-900">Weekly Special Offers</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Weekly Special Offers
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {weeklyOffers.map((offer) => (
-            <div 
+            <div
               key={offer.id}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform hover:scale-105"
             >
               <div className="relative">
-                <img 
+                <img
                   src={offer.imageUrl}
                   alt={offer.name}
                   className="w-full h-48 object-cover"
@@ -109,8 +118,10 @@ const WeeklyOffers = () => {
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{offer.name}</h3>
-                
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {offer.name}
+                </h3>
+
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <span className="text-2xl font-bold text-[#2E8B57]">
@@ -125,10 +136,11 @@ const WeeklyOffers = () => {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
-                    Valid until {new Date(offer.validUntil).toLocaleDateString()}
+                    Valid until{" "}
+                    {new Date(offer.validUntil).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 <div className="flex space-x-4 mt-4">
                   <button
                     onClick={() => handleAddToCart(offer)}

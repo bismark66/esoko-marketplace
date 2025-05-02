@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, LogIn, LogOut, } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ShoppingCart, Menu, X, User, LogIn, LogOut } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems } = useCart();
+  const {
+    state: { cartItems },
+  } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -34,7 +36,9 @@ export default function Navbar() {
             <Link
               to="/"
               className={`text-gray-700 hover:text-[#2E8B57] px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive('/') ? 'text-[#2E8B57] border-b-2 border-[#2E8B57]' : ''
+                isActive("/")
+                  ? "text-[#2E8B57] border-b-2 border-[#2E8B57]"
+                  : ""
               }`}
             >
               Home
@@ -42,7 +46,9 @@ export default function Navbar() {
             <Link
               to="/products"
               className={`text-gray-700 hover:text-[#2E8B57] px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/products') ? 'text-[#2E8B57] border-b-2 border-[#2E8B57]' : ''
+                isActive("/products")
+                  ? "text-[#2E8B57] border-b-2 border-[#2E8B57]"
+                  : ""
               }`}
             >
               Products
@@ -51,7 +57,7 @@ export default function Navbar() {
               <Link
                 to="/track-order"
                 className={`text-gray-700 hover:text-[#2E8B57] px-3 py-2 rounded-md text-sm font-medium ${
-                  location.pathname === '/track-order' ? 'text-[#2E8B57]' : ''
+                  location.pathname === "/track-order" ? "text-[#2E8B57]" : ""
                 }`}
               >
                 Track Order
@@ -60,7 +66,9 @@ export default function Navbar() {
             <Link
               to="/contact"
               className={`text-gray-700 hover:text-[#2E8B57] px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/contact') ? 'text-[#2E8B57] border-b-2 border-[#2E8B57]' : ''
+                isActive("/contact")
+                  ? "text-[#2E8B57] border-b-2 border-[#2E8B57]"
+                  : ""
               }`}
             >
               Contact
@@ -86,13 +94,13 @@ export default function Navbar() {
                   <User className="h-5 w-5 mr-2" />
                   <span>{user?.name}</span>
                 </Link>
-                <button
+                {/* <button
                   onClick={handleLogout}
                   className="flex items-center text-gray-700 hover:text-[#2E8B57]"
                 >
                   <LogOut className="h-5 w-5 mr-2" />
                   <span>Logout</span>
-                </button>
+                </button> */}
               </div>
             ) : (
               <Link
@@ -111,7 +119,11 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-[#2E8B57]"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -124,7 +136,9 @@ export default function Navbar() {
             <Link
               to="/"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/') ? 'text-[#2E8B57] bg-gray-100' : 'text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50'
+                isActive("/")
+                  ? "text-[#2E8B57] bg-gray-100"
+                  : "text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50"
               }`}
             >
               Home
@@ -132,7 +146,9 @@ export default function Navbar() {
             <Link
               to="/products"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/products') ? 'text-[#2E8B57] bg-gray-100' : 'text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50'
+                isActive("/products")
+                  ? "text-[#2E8B57] bg-gray-100"
+                  : "text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50"
               }`}
             >
               Products
@@ -141,9 +157,9 @@ export default function Navbar() {
               <Link
                 to="/track-order"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === '/track-order'
-                    ? 'text-[#2E8B57]'
-                    : 'text-gray-700 hover:text-[#2E8B57]'
+                  location.pathname === "/track-order"
+                    ? "text-[#2E8B57]"
+                    : "text-gray-700 hover:text-[#2E8B57]"
                 }`}
               >
                 Track Order
@@ -152,7 +168,9 @@ export default function Navbar() {
             <Link
               to="/contact"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive('/contact') ? 'text-[#2E8B57] bg-gray-100' : 'text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50'
+                isActive("/contact")
+                  ? "text-[#2E8B57] bg-gray-100"
+                  : "text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50"
               }`}
             >
               Contact
@@ -171,12 +189,12 @@ export default function Navbar() {
                 >
                   Profile
                 </Link>
-                <button
+                {/* <button
                   onClick={handleLogout}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#2E8B57] hover:bg-gray-50"
                 >
                   Logout
-                </button>
+                </button> */}
               </>
             ) : (
               <Link
