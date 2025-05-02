@@ -22,58 +22,63 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
-export interface User {
-  id: string;
-  // name: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  email: string;
-  invitationToken?: string;
-}
+// export interface User {
+//   id: string;
+//   // name: string;
+//   firstName: string;
+//   lastName: string;
+//   password: string;
+//   email: string;
+//   invitationToken?: string;
+// }
 
 export interface RegisterUserResponse {
   userId?: number;
   email?: string;
+  firstName: string;
+  lastName: string;
   userType?: string;
   status?: string;
   isEmailVerified?: boolean;
+   message: string;
+    otpReference: string;
   statusCode?: number;
   success?: boolean;
-  msg?: string;
-  data?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    isGoogle: boolean | null;
-  };
 }
 
-export interface LoginRequest {
+export interface LoginRequestType {
   email: string;
   password: string;
-  deviceId?: string;
-  deviceInfo?: {
-    appVersion?: string;
-    platform?: string;
-    model?: string;
-  };
+  // deviceId?: string;
+  // deviceInfo?: {
+  //   appVersion?: string;
+  //   platform?: string;
+  //   model?: string;
+  // };
+}
+
+export interface User {
+  // id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  userType: "AGENT" | "ADMIN";
+  status: "ACTIVE" | "INACTIVE";
+  lastLogin: string;
+}
+
+export interface CreateUser{
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
-  user: {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    userType: "AGENT" | "ADMIN";
-    status: "ACTIVE" | "INACTIVE";
-    lastLogin: string;
-  };
+  user: User;
 }
 
 export type PasswordResetResponse = {
