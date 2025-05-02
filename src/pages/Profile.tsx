@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Edit,
 } from "lucide-react";
+// import { User } from "@/types";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -50,12 +51,13 @@ export default function Profile() {
                     {user.profileImage ? (
                       <img
                         src={user.profileImage}
-                        alt={user.name}
+                        alt={user.user.firstName}
                         className="w-14 h-14 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-14 h-14 rounded-full bg-[#2E8B57] flex items-center justify-center text-white text-xl font-semibold">
-                        {user.name?.charAt(0).toUpperCase()}
+                        {user.user.firstName?.charAt(0).toUpperCase() +
+                          user.user.lastName?.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <button
@@ -66,8 +68,10 @@ export default function Profile() {
                     </button>
                   </div>
                   <div className="ml-4">
-                    <h2 className="font-semibold text-lg">{user.name}</h2>
-                    <p className="text-gray-500 text-sm">{user.email}</p>
+                    <h2 className="font-semibold text-lg">
+                      {user.user.firstName}
+                    </h2>
+                    <p className="text-gray-500 text-sm">{user.user.email}</p>
                   </div>
                 </div>
 
@@ -222,7 +226,7 @@ export default function Profile() {
                             Full Name
                           </label>
                           <p className="mt-1 text-gray-900 font-medium">
-                            {user.name}
+                            {user.user.firstName + " " + user.user.lastName}
                           </p>
                         </div>
                         <div>
@@ -230,7 +234,7 @@ export default function Profile() {
                             Email
                           </label>
                           <p className="mt-1 text-gray-900 font-medium">
-                            {user.email}
+                            {user.user.email}
                           </p>
                         </div>
                         <div>
@@ -238,7 +242,7 @@ export default function Profile() {
                             Phone
                           </label>
                           <p className="mt-1 text-gray-900 font-medium">
-                            {user.phone || "Not specified"}
+                            {"Not specified"}
                           </p>
                         </div>
                         <div>
@@ -246,9 +250,7 @@ export default function Profile() {
                             Account Type
                           </label>
                           <p className="mt-1 text-gray-900 font-medium">
-                            {user.accountType === "farmer"
-                              ? "Farmer/Seller"
-                              : "Buyer"}
+                            {user.user.userType}
                           </p>
                         </div>
                       </div>
