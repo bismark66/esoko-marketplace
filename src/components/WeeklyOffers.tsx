@@ -144,14 +144,14 @@ const WeeklyOffers = () => {
                 <div className="flex space-x-4 mt-4">
                   <button
                     onClick={() => handleAddToCart(offer)}
-                    className="flex-1 bg-[#2E8B57] text-white px-4 py-2 rounded-full hover:bg-[#256F3A] transition-colors flex items-center justify-center"
+                    className="flex-1 bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     Add to Cart
                   </button>
                   <button
                     onClick={() => handleViewDetails(offer.id)}
-                    className="flex-1 bg-[#8B4513] text-white px-4 py-2 rounded-full hover:bg-[#6B3410] transition-colors"
+                    className="flex-1 bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
                   >
                     View Details
                   </button>
