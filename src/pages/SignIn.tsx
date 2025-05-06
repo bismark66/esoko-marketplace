@@ -40,17 +40,6 @@ export default function SignIn() {
         },
       }
     );
-    // const response = await login(email, password);
-
-    //   try {
-    //     await login(email, password);
-
-    //     navigate(from, { replace: true });
-    //   } catch (err) {
-    //     setError("Invalid email or password");
-    //   } finally {
-    //     setLoading(false);
-    //   }
   };
 
   if (isPending) {
@@ -153,7 +142,7 @@ export default function SignIn() {
 
               <div className="text-sm">
                 <a
-                  href="#"
+                  href="/password-reset"
                   className="font-medium text-[#2E8B57] hover:text-[#256F3A]"
                 >
                   Forgot your password?
