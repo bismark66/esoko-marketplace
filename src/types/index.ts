@@ -58,6 +58,7 @@ export interface LoginRequestType {
 }
 
 export interface User {
+  phone: string;
   // id: number;
   email: string;
   firstName: string;
@@ -67,7 +68,7 @@ export interface User {
   lastLogin: string;
 }
 
-export interface CreateUser{
+export interface CreateUser {
   firstName: string;
   lastName: string;
   email: string;
@@ -75,6 +76,8 @@ export interface CreateUser{
 }
 
 export interface LoginResponse {
+  passwordChangedAt: string;
+  addresses: boolean;
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
@@ -83,12 +86,30 @@ export interface LoginResponse {
 
 export type PasswordResetResponse = {
   message: string;
-  status: string;
 };
 
 export type PasswordChangeType = {
   currentPassword: string;
   newPassword: string;
+};
+
+export type RequestPasswordResetResponse = {
+  message: string;
+  expiresAt: string;
+};
+export type ResetPassOtpVerifyResponse = {
+  message: string;
+  resetToken: string;
+};
+
+export type PasswordResetType = {
+  newPassword: string;
+  resetToken: string;
+};
+
+export type PasswordResetOtpType = {
+  email: string;
+  otp: string;
 };
 
 export type EmailVerifyType = {
@@ -106,4 +127,9 @@ export type ApiError = {
     message: string;
   };
   details?: ApiErrorDetail;
+};
+
+export type UpdateUserType = {
+  firstName: string;
+  lastName: string;
 };
