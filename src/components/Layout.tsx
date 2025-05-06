@@ -9,7 +9,7 @@ import Navbar from "./Navbar";
 
 function LayoutHandler() {
   const location = useLocation();
-  const noLayoutRoutes = ["/signin", "/signup"];
+  const noLayoutRoutes = ["/signin", "/signup", "/password-reset"];
 
   const isNoLayout = noLayoutRoutes.includes(location.pathname);
 

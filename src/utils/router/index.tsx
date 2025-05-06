@@ -16,6 +16,7 @@ import FAQ from "@/pages/FAQ";
 import About from "@/pages/About";
 import Orders from "@/pages/Orders";
 import OrderConfirmation from "@/pages/OrderConfirmation";
+import ResetPasswordRequestPage from "@/pages/PasswordReset";
 
 const routerConfig = [
   {
@@ -133,6 +134,13 @@ const routerConfig = [
   {
     path: "/product/:id",
     element: <ProductDetail />,
+    exact: true,
+    loader: () => "",
+    protected: false,
+  },
+  {
+    path: "/password-reset",
+    element: <ResetPasswordRequestPage />,
     exact: true,
     loader: () => "",
     protected: false,

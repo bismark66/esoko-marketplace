@@ -133,7 +133,7 @@ export default function FeaturedProducts() {
                     </span>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="bg-[#8B4513] text-white px-4 py-2 rounded-full hover:bg-[#6B3410] transition-colors"
+                      className="flex-1 bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
                     >
                       Add to Cart
                     </button>

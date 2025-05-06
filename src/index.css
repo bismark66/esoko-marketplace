@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer base {
+  :root {
+    /* Convert your hex colors to RGB for CSS variables */
+    --default-bg: 255 255 255;
+    --bg-dark: 249 250 251;
+    --bg-contrast: 255 253 208;
+    --footer-bg: 17 24 39;
+    --primary-btn: 46 139 87;
+    --primary-btn-hover: 37 111 58;
+    --primary-btn-disabled: 163 227 184;
+    --secondary-btn: 249 250 251;
+    --secondary-btn-hover: 229 231 235;
+    --secondary-btn-disabled: 243 244 246;
+    --text-default: 17 24 39;
+    --text-primary: 17 24 39;
+    --text-secondary: 55 65 81;
+  }
+
+  body {
+    @apply bg-default-bg text-text-default;
+  }
+
+  /* Add other base styles as needed */
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-btn hover:bg-primary-btn-hover disabled:bg-primary-btn-disabled text-white px-4 py-2 rounded transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-btn hover:bg-secondary-btn-hover disabled:bg-secondary-btn-disabled text-text-primary border border-gray-300 px-4 py-2 rounded transition-colors;
+  }
+
+  .section-dark {
+    @apply bg-bg-dark;
+  }
+
+  .section-contrast {
+    @apply bg-bg-contrast;
+  }
+
+  .footer {
+    @apply bg-footer-bg text-white;
+  }
+}
+
 /* Custom animations */
 
 @keyframes fadeInOut {
