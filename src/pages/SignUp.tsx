@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { UserPlus } from "lucide-react";
-import { useSignUp } from "@/utils/api/hooks";
-import { useLogin } from "@/utils/api/hooks";
+import { useSignUp, useLogin, useOtpVerify } from "@/utils/api/hooks";
 import { setAccessToken, setUser } from "@/utils/helpers";
-import { Modal } from "@/components/Modal";
+import { OTPModal } from "@/components/OtpModal";
+import { AppModal } from "@/components/AppModal";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -21,6 +21,15 @@ export default function SignUp() {
   const { login, dispatch } = useAuth();
   const { mutate, isLoading } = useSignUp();
   const { mutate: loginMutate } = useLogin();
+  const { mutate: verifyOtpMutate } = useOtpVerify();
+  const [showOTP, setShowOTP] = useState(false);
+  const userEmail = "user@example.com";
+  const [otpState, setOtpState] = useState({
+    isLoading: false,
+    isResending: false,
+    countdown: 30,
+    error: "",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,32 +60,7 @@ export default function SignUp() {
             setLoading(false);
             return;
           }
-
-          // Simulate successful registration and login
-          // if(data) {return <Modal isOpen={isModalOpen} onClose={handleModalClose}>
-          //   <h2>Account Created</h2>
-          //   <p>Your account has been created successfully!</p>
-          // </Modal>}
-          // await login(formData.email, formData.password);
-          loginMutate(
-            { email: formData.email, password: formData.password },
-            {
-              onSuccess: (data) => {
-                console.log("Logged in!", data);
-                setAccessToken(data.accessToken);
-                setUser(data);
-                dispatch({ type: "LOGIN", payload: data });
-                dispatch({ type: "SET_USER", payload: data.user });
-                // navigate(from, { replace: true });
-              },
-              onError: (error) => {
-                console.error("Login error:", error.message);
-                setError("Invalid email or password");
-              },
-            }
-          );
-          navigate("/");
-          setLoading(false);
+          setShowOTP(true);
         },
         onError: (error: any) => {
           console.log("Error:", error);
@@ -91,19 +75,81 @@ export default function SignUp() {
       setLoading(false);
       return;
     }
+  };
+  // Countdown timer
+  useEffect(() => {
+    const timer =
+      otpState.countdown > 0 &&
+      setTimeout(
+        () => setOtpState((s) => ({ ...s, countdown: s.countdown - 1 })),
+        1000
+      );
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [otpState.countdown]);
 
-    // try {
-    //   // TODO: Implement actual registration logic
-    //   console.log("Registering user:", formData);
+  const handleVerifyOTP = async (otp: string) => {
+    setOtpState({ ...otpState, isLoading: true, error: "" });
+    try {
+      console.log("Verifying OTP:", otp);
+      verifyOtpMutate(
+        { contact: formData.email, otp, purpose: "EMAIL_VERIFICATION" },
+        {
+          onSuccess: (data) => {
+            console.log("OTP verified!", data);
+            // setAccessToken(data.accessToken);
+            // setUser(data.user);
+            // dispatch({ type: "LOGIN", payload: data });
+            // dispatch({ type: "SET_USER", payload: data.user });
+            // navigate("/");
 
-    //   // Simulate successful registration and login
-    //   await login(formData.email, formData.password);
-    //   navigate("/");
-    // } catch (err) {
-    //   setError("Registration failed. Please try again.");
-    // } finally {
-    //   setLoading(false);
-    // }
+            loginMutate(
+              { email: formData.email, password: formData.password },
+              {
+                onSuccess: (data) => {
+                  console.log("Logged in!", data);
+                  setAccessToken(data.accessToken);
+                  setUser(data);
+                  dispatch({ type: "LOGIN", payload: data });
+                  dispatch({ type: "SET_USER", payload: data.user });
+                  navigate("/");
+                },
+                onError: (error) => {
+                  console.error("Login error:", error.message);
+                  setError("Invalid email or password");
+                },
+              }
+            );
+          },
+          onError: (error) => {
+            console.error("OTP verification error:", error.message);
+            setOtpState({
+              ...otpState,
+              error: "Invalid OTP code",
+              isLoading: false,
+            });
+          },
+        }
+      );
+      setShowOTP(false);
+    } catch (error) {
+      setOtpState({ ...otpState, error: "Invalid OTP code", isLoading: false });
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setOtpState({ ...otpState, isResending: true, error: "" });
+    try {
+      // await resendOTP();
+      setOtpState((s) => ({ ...s, countdown: 30, isResending: false }));
+    } catch (error) {
+      setOtpState({
+        ...otpState,
+        error: "Failed to resend code",
+        isResending: false,
+      });
+    }
   };
 
   return (
@@ -289,6 +335,18 @@ export default function SignUp() {
           </div>
         </div>
       </div>
+      <AppModal isOpen={showOTP} onClose={() => setShowOTP(false)}>
+        <OTPModal
+          email="user@example.com"
+          onVerify={handleVerifyOTP}
+          onResend={handleResendOTP}
+          onClose={() => setShowOTP(false)}
+          isLoading={otpState.isLoading}
+          isResending={otpState.isResending}
+          countdown={otpState.countdown}
+          error={otpState.error}
+        />
+      </AppModal>
     </div>
   );
 }
