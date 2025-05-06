@@ -383,13 +383,13 @@ export default function Products() {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
                           onClick={() => navigate(`/product/${product.id}`)}
-                          className="w-full md:w-auto bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
+                          className="w-full md:w-auto bg-primary-btn text-white px-4 py-2 rounded-md hover:bg-primary-btn-hover transition-colors"
                         >
                           View Item
                         </button>
                         <button
                           onClick={() => handleAddToCart(product)}
-                          className="w-full md:w-auto bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
+                          className="w-full md:w-auto bg-primary-btn text-white px-4 py-2 rounded-md hover:bg-primary-btn-hover transition-colors"
                         >
                           Add to Cart
                         </button>
