@@ -52,15 +52,12 @@ const ResetPasswordRequestPage = () => {
 
     try {
       setLoading(true);
-      console.log("thi is email", email);
-
       requestPassResetMutate(
         {
           email,
         },
         {
           onSuccess: (data) => {
-            console.log("reset success", data);
             setShowOTP(true);
             // return data;
           },
@@ -87,12 +84,10 @@ const ResetPasswordRequestPage = () => {
   const handleVerifyOTP = async (otp: string) => {
     setOtpState({ ...otpState, isLoading: true, error: "" });
     try {
-      console.log("Verifying OTP:", otp);
       verifyPassResetOtpMutate(
         { email, otp },
         {
           onSuccess: (data: ResetPassOtpVerifyResponse) => {
-            console.log("OTP verified!", data);
             if (data.resetToken) {
               setResetToken(data.resetToken);
             }
@@ -137,7 +132,6 @@ const ResetPasswordRequestPage = () => {
         },
         {
           onSuccess: (data) => {
-            console.log("password reset successful", data);
             setIsModalOpen(false);
             navigator("/signin");
           },
@@ -148,7 +142,6 @@ const ResetPasswordRequestPage = () => {
         }
       );
     } catch (err) {
-      console.log("error submiting new password");
       return err;
     }
   };
