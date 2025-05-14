@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
-import { Product } from "../types/Product";
-import { mockProducts } from "../data/mockProducts";
+import { ProductState } from "@/types";
 
-interface ProductState {
-  products: Product[];
-  filteredProducts: Product[];
-  loading: boolean;
-  error: string | null;
-  searchQuery: string;
-  categoryFilter: string;
-}
+
 
 type ProductAction =
   | { type: "SET_PRODUCTS"; payload: Product[] }

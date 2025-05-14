@@ -1,71 +1,151 @@
 # Esoko Market Place Project
 
-A modern, high-performance e-commerce solution built with Vite.
+A modern, high-performance agricultural e-commerce platform built with Vite, React, and TypeScript.
+
+## Table of Contents
+- [Esoko Market Place Project](#esoko-market-place-project)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+    - [Core Features](#core-features)
+    - [Performance Optimizations](#performance-optimizations)
+  - [Tech Stack](#tech-stack)
+    - [Frontend](#frontend)
+    - [State Management](#state-management)
+    - [Backend Integration](#backend-integration)
+    - [Testing](#testing)
+    - [DevOps](#devops)
+  - [Architecture](#architecture)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+- [Clone the repository](#clone-the-repository)
+- [Navigate to project directory](#navigate-to-project-directory)
+- [Install dependencies](#install-dependencies)
+- [or](#or)
+- [Copy environment variables](#copy-environment-variables)
+- [Start development server](#start-development-server)
+- [or](#or-1)
+- [ENV variables](#env-variables)
+- [Start development server](#start-development-server-1)
+- [Build for production](#build-for-production)
+- [Preview production build locally](#preview-production-build-locally)
+- [Run tests](#run-tests)
+- [Run linter](#run-linter)
+- [Format code](#format-code)
+- [Build Docker image](#build-docker-image)
+- [Run container](#run-container)
 
 ## Features
 
-⚡️ Lightning-fast development with Vite
-🛒 Complete shopping cart functionality
-💳 Secure payment processing
-📱 Responsive design for all devices
-🔍 Product search and filtering
-👤 User authentication and profiles
+### Core Features
+⚡️ Lightning-fast development with Vite  
+🛒 Complete shopping cart with persistence  
+💳 Secure payment processing (Mobile Money & Credit Cards)  
+📱 Fully responsive design  
+🔍 Advanced product search and filtering  
+👤 JWT-based user authentication  
+📦 Order tracking system  
+📊 Admin dashboard (coming soon)
+
+### Performance Optimizations
+- Code splitting with React.lazy
+- Image optimization
+- Memoized components
+- Efficient state management
+- Progressive Web App ready
 
 ## Tech Stack
 
-- Vite
-- CSS with optional Tailwind integration
-- Backend integration (....)
+### Frontend
+- **Vite** (Build tool)
+- **React 18** (UI Library)
+- **TypeScript** (Type checking)
+- **TanStack Query** (Data fetching)
+- **React Router 6** (Routing)
+- **Tailwind CSS** (Styling)
+- **React Hook Form** (Forms)
+- **Zod** (Validation)
+- **Axios** (HTTP client)
+
+### State Management
+- Context API (Auth, Cart)
+- useReducer (Complex state logic)
+
+### Backend Integration
+- RESTful API (JSON)
+- JWT Authentication
+
+### Testing
+- Vitest (Unit testing)
+- React Testing Library
+- Mock Service Worker (API mocking)
+
+### DevOps
+- Docker (Containerization)
+- GitHub Actions (CI/CD)
+- Nginx (Production server)
+- Sentry (Error monitoring)
+
+## Architecture
+
 
 ## Getting Started
 
 ### Prerequisites
 
-Node.js (v16+)
+- Node.js v18+
+- npm v9+ or yarn v1.22+
+- Git
 
-npm or yarn
+### Installation
 
-## Installation
-
-```
+```bash
 # Clone the repository
 git clone git@github.com:esoko-ghana/esoko-marketplace.git
 
 # Navigate to project directory
-cd /project-directory
+cd esoko-marketplace
 
 # Install dependencies
 npm install
 # or
 yarn install
 
+# Copy environment variables
+cp .env.example .env
+
 # Start development server
 npm run dev
 # or
 yarn dev
 
-```
 
-# Code Level Documentation 
+# ENV variables
+VITE_API_BASE_URL=
 
-### Routing
 
-* @file routerConfig.tsx
- * @description This file exports an array of route definitions for the entire app.
- * Each route definition is an object with the following properties:
- * - path: The path of the route.
- * - element: The component to render on the route.
- * - exact: Whether the route is an exact match.
- * - loader: A function that is called when the route is first loaded. The
- *   function should return a promise that resolves to a string that will be
- *   rendered on the page. This is useful for making API calls to fetch data
- *   that should be displayed on the page.
- * @example
- ```
- {
-    path: "/",
-    element: <Home />,
-    exact: true,
-    loader: () => fetch("https://example.com/api/data").then(res => res.text()),
-  }
- ```
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build locally
+npm run preview
+
+# Run tests
+npm run test
+
+# Run linter
+npm run lint
+
+# Format code
+npm run format
+
+
+# Build Docker image
+docker build -t esoko-marketplace .
+
+# Run container
+docker run -p 5173:80 esoko-marketplace

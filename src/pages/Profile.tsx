@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -18,7 +18,14 @@ import {
   X,
   Lock,
 } from "lucide-react";
-import { useChangePassword, useUpdateProfile } from "@/utils/api/hooks";
+import {
+  useChangePassword,
+  useUpdateProfile,
+  useProfile,
+} from "@/utils/api/hooks";
+import { getProfileQueryFn } from "@/utils/api/queryfns";
+import App from "@/App";
+import AppLoader from "@/components/AppLoader";
 
 interface Address {
   id: string;
@@ -110,8 +117,11 @@ export default function Profile() {
     type: "success" | "error";
   } | null>(null);
 
+  // const { profile, setProfile } = useState<any>({});
+
   const { mutate: changePassword, isLoading: isChanging } = useChangePassword();
   const { mutate: updateProfile, isLoading: isUpdating } = useUpdateProfile();
+  const { data: profile, isLoading: isProfileLoading, error } = useProfile();
 
   // Mock recent order data - replace with real API call
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([
@@ -261,9 +271,8 @@ export default function Profile() {
     navigate("/");
   };
 
-  if (!authUser) {
-    navigate("/signin");
-    return null;
+  if (isProfileLoading) {
+    return <AppLoader />;
   }
 
   return (
@@ -297,8 +306,8 @@ export default function Profile() {
                       />
                     ) : (
                       <div className="w-14 h-14 rounded-full bg-[#2E8B57] flex items-center justify-center text-white text-xl font-semibold">
-                        {user?.firstName?.charAt(0).toUpperCase()}
-                        {user?.lastName?.charAt(0).toUpperCase()}
+                        {profile?.firstName?.charAt(0).toUpperCase()}
+                        {profile?.lastName?.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <button
@@ -309,8 +318,10 @@ export default function Profile() {
                     </button>
                   </div>
                   <div className="ml-4">
-                    <h2 className="font-semibold text-lg">{user?.firstName}</h2>
-                    <p className="text-gray-500 text-sm">{user?.email}</p>
+                    <h2 className="font-semibold text-lg">
+                      {profile?.firstName}
+                    </h2>
+                    <p className="text-gray-500 text-sm">{profile?.email}</p>
                   </div>
                 </div>
 
@@ -505,7 +516,7 @@ export default function Profile() {
                               />
                             ) : (
                               <p className="mt-1 text-gray-900 font-medium">
-                                {user?.firstName}
+                                {profile?.firstName}
                               </p>
                             )}
                           </div>
@@ -525,7 +536,7 @@ export default function Profile() {
                               />
                             ) : (
                               <p className="mt-1 text-gray-900 font-medium">
-                                {user?.lastName}
+                                {profile?.lastName}
                               </p>
                             )}
                           </div>
@@ -545,7 +556,7 @@ export default function Profile() {
                               />
                             ) : (
                               <p className="mt-1 text-gray-900 font-medium">
-                                {user?.email}
+                                {profile?.email}
                               </p>
                             )}
                           </div>
@@ -566,7 +577,7 @@ export default function Profile() {
                               />
                             ) : (
                               <p className="mt-1 text-gray-900 font-medium">
-                                {user?.phone || "Not specified"}
+                                {profile?.phoneNumber || "Not specified"}
                               </p>
                             )}
                           </div>
@@ -800,33 +811,39 @@ export default function Profile() {
                           </button>
                         </div>
 
-                        {recentOrders.length > 0 ? (
+                        {profile?.recentOrders?.length > 0 ? (
                           <div className="space-y-3">
-                            {recentOrders.map((order) => (
+                            {profile?.recentOrders.map((order) => (
                               <div
                                 key={order.id}
                                 onClick={() => navigate(`/orders/${order.id}`)}
                                 className="flex justify-between items-center p-3 bg-white rounded-md border border-gray-100 cursor-pointer hover:shadow-sm"
                               >
                                 <div>
-                                  <p className="font-medium">{order.id}</p>
+                                  <p className="font-medium">
+                                    {order.orderNumber}
+                                  </p>
                                   <p className="text-sm text-gray-500">
-                                    {order.date}
+                                    {order.orderDate}
                                   </p>
                                 </div>
                                 <div className="text-right">
                                   <p className="font-semibold">
-                                    ${order.total.toFixed(2)}
+                                    GHC{order.totalAmount}
                                   </p>
                                   <span
                                     className={`text-xs px-2 py-1 rounded-full ${
-                                      order.status === "Delivered"
+                                      order.status === "DELIVERED"
                                         ? "bg-green-100 text-green-800"
-                                        : order.status === "Processing"
+                                        : order.status === "PROCESSING"
                                         ? "bg-blue-100 text-blue-800"
-                                        : order.status === "Shipped"
+                                        : order.status === "SHIPPED"
                                         ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-red-100 text-red-800"
+                                        : order.status === "CANCELLED"
+                                        ? "bg-red-100 text-red-800"
+                                        : order.status === "PENDING"
+                                        ? "bg-gray-100 text-gray-800"
+                                        : "bg-red-100 text-brown-800"
                                     }`}
                                   >
                                     {order.status}
@@ -864,9 +881,9 @@ export default function Profile() {
                           </button>
                         </div>
 
-                        {user?.addresses && user.addresses.length > 0 ? (
+                        {profile?.addresses && profile.addresses.length > 0 ? (
                           <div className="space-y-3">
-                            {user.addresses.slice(0, 1).map((address) => (
+                            {profile.addresses.slice(0, 1).map((address) => (
                               <div
                                 key={address.id}
                                 className="p-3 bg-white rounded-md border border-gray-100"
@@ -874,20 +891,19 @@ export default function Profile() {
                                 <div className="flex items-start justify-between">
                                   <div>
                                     <p className="font-medium">
-                                      {address.name}
+                                      {address.city}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
                                       {address.street}
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                      {address.city}, {address.state}{" "}
-                                      {address.zip}
+                                      {address.region} {address.postalCode}
                                     </p>
                                     <p className="text-sm text-gray-500">
                                       {address.country}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
-                                      {address.phone}
+                                      {profile.phoneNumber}
                                     </p>
                                   </div>
                                   {address.isDefault && (
@@ -898,12 +914,12 @@ export default function Profile() {
                                 </div>
                               </div>
                             ))}
-                            {user.addresses.length > 1 && (
+                            {profile.addresses.length > 1 && (
                               <button
                                 onClick={() => navigate("/addresses")}
                                 className="text-sm text-gray-500 hover:underline"
                               >
-                                +{user.addresses.length - 1} more address(es)
+                                +{profile.addresses.length - 1} more address(es)
                               </button>
                             )}
                           </div>

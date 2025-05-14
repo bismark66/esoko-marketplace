@@ -5,8 +5,8 @@ interface ImageCarouselProps {
   title: string;
   autoRotate?: boolean;
   rotationInterval?: number;
-  containerClassName?: string; // for outer wrapper
-  imageContainerClassName?: string; // for image section
+  containerClassName?: string;
+  imageContainerClassName?: string;
 }
 
 const ImageCarousel = ({
@@ -43,7 +43,9 @@ const ImageCarousel = ({
   }, [currentIndex, images.length, autoRotate, rotationInterval]);
 
   return (
-    <div className={containerClassName}>
+    <div className={`relative ${containerClassName}`}>
+      {" "}
+      {/* Added relative here */}
       {/* Image container */}
       <div className={imageContainerClassName}>
         {images.map((img, index) => (
@@ -58,36 +60,36 @@ const ImageCarousel = ({
           />
         ))}
       </div>
-
       {/* Navigation Arrows */}
       {images.length > 1 && (
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:opacity-100"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 text-green p-2 rounded-full z-10 hover:bg-black/90 transition-colors"
             aria-label="Previous image"
           >
             <ChevronLeftIcon />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:opacity-100"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 text-green p-2 rounded-full z-10 hover:bg-black/90 transition-colors"
             aria-label="Next image"
           >
             <ChevronRightIcon />
           </button>
         </>
       )}
-
       {/* Dots Indicator */}
       {images.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
           {images.map((_, index) => (
             <button
               key={index}
               onClick={() => goToIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-white w-4" : "bg-white/50"
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "bg-[#2E8B57] w-6"
+                  : "bg-white/80 hover:bg-green"
               }`}
               aria-label={`Go to image ${index + 1}`}
               aria-current={index === currentIndex}
@@ -99,6 +101,7 @@ const ImageCarousel = ({
   );
 };
 
+// Chevron icons remain the same
 const ChevronLeftIcon = (): JSX.Element => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
