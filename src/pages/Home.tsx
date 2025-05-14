@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import Benefits from "@/components/Benefits";
@@ -19,4 +19,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;
