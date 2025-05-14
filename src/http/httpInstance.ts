@@ -1,8 +1,7 @@
 import { getAccessToken } from "../utils/helpers";
-import { handleHttpResponse } from "./httpResponse";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:3000/api";
 class HttpClient {
   private async request<T, B = unknown>(
     path: string,
@@ -10,57 +9,67 @@ class HttpClient {
     options?: RequestInit & { body?: B }
   ): Promise<T> {
     const token = getAccessToken();
+    const fullUrl = `${API_BASE_URL}${path}`;
+
+    console.debug("[API Request]", { method, url: fullUrl }); // Debug log
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+      Authorization: `Bearer ${token}`,
       ...(options?.headers || {}),
     };
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-    const config: RequestInit = {
-      method,
-      headers,
-      ...options,
-      signal: controller.signal,
-      body: options?.body ? JSON.stringify(options.body) : undefined,
-    };
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const response = await fetch(`${API_BASE_URL}${path}`, config);
+      const response = await fetch(fullUrl, {
+        method,
+        headers,
+        ...options,
+        signal: controller.signal,
+        body: options?.body ? JSON.stringify(options.body) : undefined,
+      });
       clearTimeout(timeout);
 
-      const contentType = response.headers.get("Content-Type") || "";
-
-      // Clone response before handling
-      const responseClone = response.clone();
-      const responseData = contentType.includes("application/json")
-        ? await handleHttpResponse<T>(response)
-        : ((await responseClone.text()) as unknown as T);
-
-      if (response.ok) {
-        if (process.env.NODE_ENV === "development") {
-          console.log(`[API Success] ${method} ${path}`, {
-            status: response.status,
-            data: responseData,
-          });
-        }
-      } else {
-        // Handle token refresh flow here if response.status === 401
-        if (process.env.NODE_ENV === "development") {
-          console.warn(`[API Error] ${method} ${path}`, {
-            status: response.status,
-            error: responseData,
-          });
-        }
+      // First check if we got an ngrok error page
+      const textResponse = await response.clone().text();
+      if (
+        textResponse.includes("ngrok-free.app") ||
+        textResponse.includes("ERR_NGROK")
+      ) {
+        throw new Error(
+          `Ngrok interception: ${
+            textResponse.match(/ERR_NGROK_\d+/)?.[0] || "Unknown ngrok error"
+          }`
+        );
       }
 
-      return responseData;
+      // Then handle JSON responses
+      const contentType = response.headers.get("Content-Type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(`Unexpected Content-Type: ${contentType}`);
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("[API Error]", {
+          status: response.status,
+          url: fullUrl,
+          error: data,
+        });
+        throw data;
+      }
+
+      return data;
     } catch (error) {
       clearTimeout(timeout);
-      console.error(`[API Exception] ${method} ${path}`, error);
+      console.error("[API Request Failed]", {
+        method,
+        url: fullUrl,
+        error: error instanceof Error ? error.message : error,
+      });
       throw error;
     }
   }
