@@ -50,7 +50,7 @@ pipeline {
                                 // Update the image in the service
                                 sh """
                                 ssh -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=no ${SSH_USER}@196.61.35.198 << EOF
-                                docker service update --image ${env.IMAGE}:${env.TAG} ${STACK}_${SERVICE}
+                                docker service update --with-registry-auth --force --image ${env.IMAGE}:${env.TAG} ${STACK}_${SERVICE}
                                 exit
                                 EOF
                                 """
