@@ -146,7 +146,6 @@ export default function SignUp() {
       },
       {
         onSuccess: async (data) => {
-          console.log("Signup successful - Full response:", data);
           // login after registration
           loginMutate(
             { email: data.email, password: formData.password },
@@ -170,7 +169,6 @@ export default function SignUp() {
           // setShowOTP(true);
         },
         onError: (error: any) => {
-          console.log("Error:", error);
           setError("Registration failed. Please try again.");
           setLoading(false);
         },
