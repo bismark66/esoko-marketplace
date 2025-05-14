@@ -32,6 +32,9 @@ A modern, high-performance agricultural e-commerce platform built with Vite, Rea
 - [Run tests](#run-tests)
 - [Run linter](#run-linter)
 - [Format code](#format-code)
+- [Run all tests](#run-all-tests)
+- [Run tests in watch mode](#run-tests-in-watch-mode)
+- [Generate coverage report](#generate-coverage-report)
 - [Build Docker image](#build-docker-image)
 - [Run container](#run-container)
 
@@ -87,7 +90,23 @@ A modern, high-performance agricultural e-commerce platform built with Vite, Rea
 - Sentry (Error monitoring)
 
 ## Architecture
-
+esoko-marketplace/
+├── src/
+│ ├── assets/ # Static assets
+│ ├── components/ # Reusable components
+│ ├── context/ # Global state
+│ ├── hooks/ # Custom hooks
+│ ├── pages/ # Route components
+│ ├── services/ # API services
+│ ├── styles/ # Global styles
+│ ├── types/ # Type definitions
+│ ├── utils/ # Utility functions
+│ ├── App.tsx # Main app component
+│ └── main.tsx # Entry point
+├── public/ # Public assets
+├── .env.example # Environment variables template
+├── vite.config.ts # Vite configuration
+└── tsconfig.json # TypeScript configuration
 
 ## Getting Started
 
@@ -119,6 +138,8 @@ npm run dev
 # or
 yarn dev
 
+Development server runs on http://localhost:5173
+
 
 # ENV variables
 VITE_API_BASE_URL=
@@ -143,6 +164,14 @@ npm run lint
 # Format code
 npm run format
 
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
 
 # Build Docker image
 docker build -t esoko-marketplace .
