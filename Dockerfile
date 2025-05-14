@@ -14,7 +14,7 @@ RUN npm run build
 FROM nginx:alpine AS runtime
 
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-ENV APP_PORT=5173
+ENV APP_PORT=80
 
 EXPOSE ${APP_PORT}
 CMD ["nginx", "-g", "daemon off;"]
