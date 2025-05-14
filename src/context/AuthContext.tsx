@@ -7,8 +7,6 @@ import React, {
   ReactNode,
 } from "react";
 import { LoginResponse, User } from "@/types";
-// import { get } from "http";
-// import { User } from "lucide-react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -16,7 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   error?: string;
-  dispatch: React.Dispatch<AuthAction>; // Now required
+  dispatch: React.Dispatch<AuthAction>;
 }
 
 type AuthAction =
@@ -76,21 +74,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeAuth = () => {
       try {
-        // const token = localStorage.getItem("accessToken");
-        // const user = localStorage.getItem("user");
         const token = getAccessToken();
         const user = getUser();
 
         if (token && user) {
-          const parsedUser = JSON.parse(user) as User;
+          // First check if user is already a parsed object
+          let parsedUser: User;
+          if (typeof user === "string") {
+            parsedUser = JSON.parse(user);
+          } else if (typeof user === "object" && user !== null) {
+            parsedUser = user as User;
+          } else {
+            throw new Error("Invalid user data format");
+          }
+
           if (parsedUser?.email) {
-            // Basic validation
             dispatch({ type: "LOGIN", payload: parsedUser });
           }
         }
       } catch (error) {
-        console.error("Auth initialization error:", error);
-        dispatch({ type: "SET_ERROR", payload: "Failed to load user session" });
+        // Clear invalid stored data
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        dispatch({
+          type: "SET_ERROR",
+          payload:
+            error instanceof Error
+              ? error.message
+              : "Failed to load user session",
+        });
       }
     };
 
@@ -109,13 +121,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
       }
 
       const data: LoginResponse = await response.json();
 
+      // Validate response structure
+      if (!data.accessToken || !data.user) {
+        throw new Error("Invalid login response");
+      }
+
       setAccessToken(data.accessToken);
-      localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch({ type: "LOGIN", payload: data.user });
     } catch (error) {
