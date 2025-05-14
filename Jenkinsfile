@@ -4,7 +4,7 @@ pipeline {
    }
     environment {
         DOCKERHUB_CRED = credentials('DOCKERHUB_CRED')
-        SERVICE = "mis_esoko-marketplace"
+        SERVICE = "esoko-marketplace"
         REG_AML_CRED = credentials('REG_AML_CRED')
         registry_URL = "reg-aml.esoko.com"
         TAG_NAME = sh(returnStdout: true, script: "git tag --points-at=HEAD").trim()
@@ -13,7 +13,7 @@ pipeline {
         imageTag = "${env.BUILD_ID}"
         TAG = "alpha"
         USER_CREDENTIALS = credentials('dev-swarm-manager-user-password')
-        STACK = "dfs"
+        STACK = "mis"
         commitMessage = ""
 
     }
