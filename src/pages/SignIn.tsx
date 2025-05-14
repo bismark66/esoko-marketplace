@@ -27,7 +27,6 @@ export default function SignIn() {
       { email, password },
       {
         onSuccess: (data) => {
-          console.log("Logged in!", data);
           setAccessToken(data.accessToken);
           setUser(data);
           dispatch({ type: "LOGIN", payload: data });
