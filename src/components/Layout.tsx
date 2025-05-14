@@ -1,6 +1,6 @@
 import NotFound from "@/pages/404";
 import routerConfig from "@/utils/router";
-import PrivateRoute from "@/utils/router/ProtectedRoute";
+import PrivateRoute from "@/utils/router/protectedRoute";
 import React from "react";
 import { useLocation, Routes, Route } from "react-router-dom";
 import AppLoader from "./AppLoader";
