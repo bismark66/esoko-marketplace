@@ -9,7 +9,7 @@ class HttpClient {
     options?: RequestInit & { body?: B }
   ): Promise<T> {
     const token = getAccessToken();
-    const fullUrl = `${API_BASE_URL}${path}`;
+    const fullUrl = `${API_BASE_URL}/v1${path}`;
 
     console.debug("[API Request]", { method, url: fullUrl }); // Debug log
 
