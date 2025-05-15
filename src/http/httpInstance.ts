@@ -1,7 +1,7 @@
 import { getAccessToken } from "../utils/helpers";
 
 const API_BASE_URL =
-  import.meta.env.VITE_APP_API_BASE_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_APP_API_BASE_URL ;
 class HttpClient {
   private async request<T, B = unknown>(
     path: string,
