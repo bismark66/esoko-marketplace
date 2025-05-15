@@ -1,21 +1,18 @@
-# Stage 1: Build
-FROM node:20 AS build
+ 
+FROM node:20-alpine
+ENV VITE_API_BASE_URL=http://digimakt-api.esoko.com:7030/v1
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY package.json .
 
-COPY package.json package-lock.json ./
 RUN npm install
-COPY . . 
-ENV VITE_API_BASE_URL=http://digimakt-api.esoko.com:7030
+
+RUN npm i -g serve
+
+COPY . .
 
 RUN npm run build
 
-# Stage 2: Run
-FROM nginx:alpine AS runtime
+EXPOSE 5173
 
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-ENV APP_PORT=80
-
-EXPOSE ${APP_PORT}
-CMD ["nginx", "-g", "daemon off;"]
-  
+CMD [ "serve", "-s", "dist" ]
