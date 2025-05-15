@@ -1,6 +1,6 @@
  
 FROM node:20-alpine
-ENV VITE_API_BASE_URL=http://digimakt-api.esoko.com:7030/v1
+ENV VITE_APP_API_BASE_URL=http://digimakt-api.esoko.com:7030
 WORKDIR /app
 
 COPY package.json .
