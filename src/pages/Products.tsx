@@ -4,209 +4,100 @@ import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductFilters from "../components/ProductFilters";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useGetAllProducts } from "../utils/api/hooks";
+import { ProductDetails } from "@/types";
 
-// Define Product interface
+// Updated Product interface to match backend response
 interface Product {
-  id: string;
+  id: number;
   name: string;
-  price: number;
-  unit: string;
-  imageUrl: string;
-  grade: string;
-  seller: {
-    name: string;
-    rating: number;
+  description: string;
+  category: string;
+  price: string;
+  currency: string;
+  stockQuantity: number;
+  imagesUrls: string[];
+  isActive: boolean;
+}
+
+// Updated pagination result interface
+interface PaginationResult {
+  data: Product[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
   };
 }
 
-// Define pagination result interface
-interface PaginationResult<T> {
-  data: T[];
-  totalItems: number;
-  totalPages: number;
-  currentPage: number;
-}
-
 export default function Products() {
-  const [activeCategory, setActiveCategory] = useState<
-    "all" | "grains" | "livestock" | "produce"
-  >("all");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { isAuthenticated } = useAuth();
   const [notification, setNotification] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6);
-  const [products, setProducts] = useState<Product[]>([]);
+  // Use the hook to get products data
+  const { data: productsResponse, error, isLoading } = useGetAllProducts();
+
+  // State for processed products
+  const [products, setProducts] = useState<ProductDetails[]>([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  // Sample fetch function to simulate API call
-  // Replace this with your actual API call
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      // In a real app, this would be an API call like:
-      // const response = await fetch(`/api/products?page=${currentPage}&limit=${itemsPerPage}&category=${activeCategory}&search=${searchQuery}`);
-      // const result = await response.json();
+  // Process products when data changes
+  useEffect(() => {
+    if (productsResponse) {
+      // Filter products based on category and search query
+      let filteredProducts = productsResponse.data;
 
-      // Simulated API response for demo purposes
-      // This would be replaced with your actual backend API call
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-
-      // Sample data structure that mimics what a backend would return
-      const sampleProductsData = {
-        grains: [
-          {
-            id: "1",
-            name: "Premium Wheat",
-            price: 320,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80",
-            grade: "Grade A",
-            seller: { name: "Midwest Grain Co.", rating: 4.8 },
-          },
-          {
-            id: "4",
-            name: "Organic Rice",
-            price: 550,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1586201375761-83865001e8ac?auto=format&fit=crop&q=80",
-            grade: "Organic",
-            seller: { name: "Pacific Farms", rating: 4.9 },
-          },
-          {
-            id: "7",
-            name: "Yellow Corn",
-            price: 280,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1592985684811-6c0f98adb014?auto=format&fit=crop&q=80",
-            grade: "Grade B",
-            seller: { name: "Heartland Suppliers", rating: 4.6 },
-          },
-        ],
-        livestock: [
-          {
-            id: "3",
-            name: "Angus Cattle",
-            price: 2100,
-            unit: "head",
-            imageUrl:
-              "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80",
-            grade: "Prime",
-            seller: { name: "Western Ranch Supplies", rating: 4.7 },
-          },
-          {
-            id: "5",
-            name: "Merino Sheep",
-            price: 450,
-            unit: "head",
-            imageUrl:
-              "https://images.unsplash.com/photo-1484557985045-edf25e08da73?auto=format&fit=crop&q=80",
-            grade: "Premium",
-            seller: { name: "Mountain Meadows Farm", rating: 4.7 },
-          },
-          {
-            id: "9",
-            name: "Heritage Pigs",
-            price: 700,
-            unit: "head",
-            imageUrl:
-              "https://images.unsplash.com/photo-1512153493142-fc2da847cb3d?auto=format&fit=crop&q=80",
-            grade: "Premium",
-            seller: { name: "Heritage Farms", rating: 4.8 },
-          },
-        ],
-        produce: [
-          {
-            id: "2",
-            name: "Organic Soybeans",
-            price: 450,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80",
-            grade: "Organic",
-            seller: { name: "Green Fields Organic", rating: 4.9 },
-          },
-          {
-            id: "6",
-            name: "Fresh Apples",
-            price: 1200,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&q=80",
-            grade: "Premium",
-            seller: { name: "Orchard Valley", rating: 4.8 },
-          },
-          {
-            id: "8",
-            name: "Organic Vegetables",
-            price: 1800,
-            unit: "ton",
-            imageUrl:
-              "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80",
-            grade: "Organic",
-            seller: { name: "Fresh Earth Farms", rating: 4.9 },
-          },
-        ],
-      };
-
-      // Simulate filtering by category and search query
-      const allProducts =
-        activeCategory === "all"
-          ? Object.values(sampleProductsData).flat()
-          : sampleProductsData[
-              activeCategory as keyof typeof sampleProductsData
-            ] || [];
+      // Apply category filter if not "all"
+      if (activeCategory !== "all") {
+        filteredProducts = filteredProducts.filter(
+          (product) => product.category === activeCategory
+        );
+      }
 
       // Apply search filter if search query exists
-      const filteredProducts = searchQuery
-        ? allProducts.filter(
-            (product) =>
-              product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              product.grade.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              product.seller.name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-          )
-        : allProducts;
+      if (searchQuery) {
+        filteredProducts = filteredProducts.filter(
+          (product) =>
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.description
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
 
-      // Calculate pagination
+      // Update pagination based on filtered results
+      setTotalItems(filteredProducts.length);
+      setTotalPages(Math.ceil(filteredProducts.length / itemsPerPage));
+
+      // Paginate the filtered results
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
-      // Set state with the paginated results
       setProducts(paginatedProducts);
-      setTotalItems(filteredProducts.length);
-      setTotalPages(Math.ceil(filteredProducts.length / itemsPerPage));
-
-      // In a real app with a backend API, you would just use the values returned from the API:
-      // setProducts(result.data);
-      // setTotalItems(result.totalItems);
-      // setTotalPages(result.totalPages);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      // Handle error state
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [productsResponse, currentPage, activeCategory, searchQuery]);
 
-  // Fetch products when component mounts or dependencies change
-  useEffect(() => {
-    fetchProducts();
-  }, [currentPage, itemsPerPage, activeCategory, searchQuery]);
+  // Get unique categories for filter
+  const categories = React.useMemo(() => {
+    if (!productsResponse?.data) return [];
+    const uniqueCategories = new Set(
+      productsResponse.data.map((product) => product.category)
+    );
+    return Array.from(uniqueCategories);
+  }, [productsResponse]);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: ProductDetails) => {
     if (!isAuthenticated) {
       navigate("/signin", { state: { from: "/products" } });
       return;
@@ -215,10 +106,10 @@ export default function Products() {
     dispatch({
       type: "ADD_ITEM",
       payload: {
-        id: product.id,
+        id: product.id.toString(),
         title: product.name,
         price: product.price,
-        image: product.imageUrl,
+        image: product.imagesUrls[0] || "",
       },
     });
 
@@ -234,7 +125,7 @@ export default function Products() {
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // You can add additional search functionality here if needed
+      // Trigger search
     }
   };
 
@@ -262,7 +153,7 @@ export default function Products() {
   const getPageNumbers = () => {
     const maxPagesToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
     // Adjust if we're near the end
     if (endPage === totalPages) {
@@ -301,7 +192,7 @@ export default function Products() {
             value={searchQuery}
             onChange={handleSearch}
             onKeyPress={handleKeyPress}
-            placeholder="Search products, sellers, grades..."
+            placeholder="Search products, categories..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
@@ -325,30 +216,48 @@ export default function Products() {
 
       {/* Category Navigation */}
       <div className="mb-8 border-b border-gray-200">
-        <div className="flex space-x-8">
-          {["all", "grains", "livestock", "produce"].map((category) => (
+        <div className="flex space-x-8 overflow-x-auto pb-2">
+          <button
+            key="all"
+            onClick={() => {
+              setActiveCategory("all");
+              setCurrentPage(1);
+            }}
+            className={`py-4 px-1 font-medium text-sm border-b-2 whitespace-nowrap ${
+              activeCategory === "all"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            All Products
+          </button>
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => {
-                setActiveCategory(category as any);
-                setCurrentPage(1); // Reset to first page when changing category
+                setActiveCategory(category);
+                setCurrentPage(1);
               }}
-              className={`py-4 px-1 font-medium text-sm border-b-2 ${
+              className={`py-4 px-1 font-medium text-sm border-b-2 whitespace-nowrap ${
                 activeCategory === category
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
+              {category}
             </button>
           ))}
         </div>
       </div>
 
       {/* Loading State */}
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500">
+          Error loading products. Please try again later.
         </div>
       ) : (
         <>
@@ -362,47 +271,50 @@ export default function Products() {
                 >
                   <div className="aspect-w-16 aspect-h-9 h-48 relative">
                     <img
-                      src={product.imageUrl}
+                      src={
+                        product.imagesUrls[0] ||
+                        "https://via.placeholder.com/300"
+                      }
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-4 right-4 bg-blue-600 text-white px-2 py-1 rounded-full text-xs">
-                      {product.grade}
+                      {product.category}
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
+                    <h3
+                      onClick={() => navigate(`/product/${product.id}`)}
+                      className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 cursor-pointer"
+                    >
                       {product.name}
                     </h3>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                      {product.description}
+                    </p>
 
-                    <div className="mt-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <div className="text-blue-600 font-medium">
-                        ₵{product.price}/{product.unit}
+                        {product.currency} {product.price}
                       </div>
-
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <button
-                          onClick={() => navigate(`/product/${product.id}`)}
-                          className="w-full md:w-auto bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
-                        >
-                          View Item
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(product)}
-                          className="w-full md:w-auto bg-[#2E8B57] text-white px-4 py-2 rounded-md hover:bg-[#2E8B57]/90 transition-colors"
-                        >
-                          Add to Cart
-                        </button>
+                      <div className="text-sm text-gray-500">
+                        Stock: {product.stockQuantity}
                       </div>
                     </div>
 
-                    <div className="mt-2 flex flex-col xs:flex-row xs:items-center xs:justify-between">
-                      <span className="text-sm text-gray-500">
-                        {product.seller.name}
-                      </span>
-                      <span className="text-sm text-blue-600">
-                        ★ {product.seller.rating}
-                      </span>
+                    <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => navigate(`/product/${product.id}`)}
+                        className="w-full md:w-auto bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                      >
+                        View Details
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full md:w-auto bg-primary-btn text-white px-4 py-2 rounded-md hover:bg-primary-btn-hover transition-colors"
+                      >
+                        Add to Cart
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -423,9 +335,9 @@ export default function Products() {
         <div className="flex justify-center items-center mt-12 space-x-2">
           <button
             onClick={goToPreviousPage}
-            disabled={currentPage === 1 || loading}
+            disabled={currentPage === 1 || isLoading}
             className={`p-2 rounded-md ${
-              currentPage === 1 || loading
+              currentPage === 1 || isLoading
                 ? "text-gray-300 cursor-not-allowed"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
@@ -439,7 +351,7 @@ export default function Products() {
               <button
                 key={page}
                 onClick={() => goToPage(page)}
-                disabled={loading}
+                disabled={isLoading}
                 className={`px-3 py-1 rounded-md ${
                   currentPage === page
                     ? "bg-blue-600 text-white"
@@ -453,9 +365,9 @@ export default function Products() {
 
           <button
             onClick={goToNextPage}
-            disabled={currentPage === totalPages || loading}
+            disabled={currentPage === totalPages || isLoading}
             className={`p-2 rounded-md ${
-              currentPage === totalPages || loading
+              currentPage === totalPages || isLoading
                 ? "text-gray-300 cursor-not-allowed"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
@@ -466,7 +378,7 @@ export default function Products() {
       )}
 
       {/* Pagination info */}
-      {!loading && products.length > 0 && (
+      {!isLoading && products.length > 0 && (
         <div className="mt-4 text-center text-sm text-gray-500">
           Showing {(currentPage - 1) * itemsPerPage + 1}-
           {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}{" "}

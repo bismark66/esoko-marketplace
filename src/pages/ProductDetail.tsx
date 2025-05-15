@@ -2,169 +2,69 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, Truck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 import ImageCarousel from "../components/ImageCarousel";
+import { useGetProduct } from "../utils/api/hooks";
 
 interface Product {
-  id: string;
-  title: string;
+  id: number;
+  name: string;
   description: string;
-  price: number;
-  image: string;
   category: string;
-  rating: number;
-  reviews: number;
-  inStock: boolean;
+  price: string;
+  currency: string;
+  stockQuantity: number;
+  imagesUrls: string[];
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string | null;
+  createdBy?: number;
 }
-
-const products: Record<string, Product> = {
-  // Regular products
-  "1": {
-    id: "1",
-    title: "Premium Organic Coffee",
-    description:
-      "High-quality organic coffee beans from sustainable farms. Perfect for coffee enthusiasts who appreciate rich flavor and ethical sourcing.",
-    price: 1200,
-    image:
-      "https://images.unsplash.com/photo-1541692641319-98172eda766f?auto=format&fit=crop&q=80",
-    category: "Beverages",
-    rating: 4.8,
-    reviews: 120,
-    inStock: true,
-  },
-  "2": {
-    id: "2",
-    title: "Fresh Organic Vegetables",
-    description:
-      "Locally sourced organic vegetables, freshly harvested and packed with nutrients. Perfect for healthy meals and snacks.",
-    price: 800,
-    image:
-      "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80",
-    category: "Produce",
-    rating: 4.6,
-    reviews: 95,
-    inStock: true,
-  },
-  "3": {
-    id: "3",
-    title: "Artisanal Bread",
-    description:
-      "Handcrafted bread made with organic flour and natural ingredients. Perfect for sandwiches or as a side to your meals.",
-    price: 600,
-    image:
-      "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80",
-    category: "Bakery",
-    rating: 4.7,
-    reviews: 85,
-    inStock: true,
-  },
-  // Discounted products
-  d1: {
-    id: "d1",
-    title: "Organic Rice",
-    description:
-      "Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.",
-    price: 950,
-    image:
-      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
-    category: "Grains",
-    rating: 4.5,
-    reviews: 75,
-    inStock: true,
-  },
-  d2: {
-    id: "d2",
-    title: "Fresh Dairy Milk",
-    description:
-      "Fresh, pasteurized milk from grass-fed cows. Rich in calcium and essential nutrients.",
-    price: 450,
-    image:
-      "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&q=80",
-    category: "Dairy",
-    rating: 4.4,
-    reviews: 60,
-    inStock: true,
-  },
-  d3: {
-    id: "d3",
-    title: "Organic Honey",
-    description:
-      "Pure, raw honey from local beekeepers. Natural sweetener with numerous health benefits.",
-    price: 750,
-    image:
-      "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&q=80",
-    category: "Sweeteners",
-    rating: 4.9,
-    reviews: 110,
-    inStock: true,
-  },
-  // Weekly offers
-  w1: {
-    id: "w1",
-    title: "Bulk Corn Supply",
-    description:
-      "High-quality corn supply for wholesale buyers. Perfect for food processing and animal feed.",
-    price: 280,
-    image:
-      "https://images.unsplash.com/photo-1601263426287-c6c51f8d5400?auto=format&fit=crop&q=80",
-    category: "Grains",
-    rating: 4.3,
-    reviews: 45,
-    inStock: true,
-  },
-  w2: {
-    id: "w2",
-    title: "Fresh Dairy Cattle",
-    description:
-      "Healthy dairy cattle for farm expansion. Vaccinated and ready for production.",
-    price: 1800,
-    image:
-      "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&q=80",
-    category: "Livestock",
-    rating: 4.7,
-    reviews: 30,
-    inStock: true,
-  },
-  w3: {
-    id: "w3",
-    title: "Organic Rice",
-    description:
-      "Premium quality organic rice, perfect for daily meals. Rich in nutrients and grown sustainably.",
-    price: 950,
-    image:
-      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80",
-    category: "Grains",
-    rating: 4.5,
-    reviews: 75,
-    inStock: true,
-  },
-};
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { dispatch } = useCart();
   const { isAuthenticated } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState("");
 
-  const product = id ? products[id] : null;
+  // Use the hook to get product data
+  const { data: product, isLoading, isError } = useGetProduct(id || "");
 
-  if (!product) {
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (isError || !product) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           Product Not Found
         </h1>
         <p className="text-gray-600 mb-8">
-          The product you're looking for doesn't exist or has been removed.
+          {/* The product you're looking for doesn't exist or has been removed. */}
+          Login to view Details of the product
         </p>
-        <button
-          onClick={() => navigate("/products")}
-          className="bg-[#2E8B57] text-white px-6 py-3 rounded-md hover:bg-[#256F3A] transition-colors"
-        >
-          Return to Home
-        </button>
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={() => navigate("/products")}
+            className="bg-[#2E8B57] text-white px-6 py-3 rounded-md hover:bg-[#256F3A] transition-colors"
+          >
+            Return to Products
+          </button>
+          <button
+            onClick={() => navigate("/signin")}
+            className="bg-[#2E8B57] text-white px-6 py-3 rounded-md hover:bg-[#256F3A] transition-colors"
+          >
+            Login
+          </button>
+        </div>
       </div>
     );
   }
@@ -175,17 +75,25 @@ export default function ProductDetail() {
       return;
     }
 
-    addToCart({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: product.id.toString(),
+        title: product.name,
+        price: parseFloat(product.price),
+        image: product.imagesUrls[0] || "",
+      },
     });
 
     // Show notification
-    setNotification(`${product.title} added to cart!`);
+    setNotification(`${product.name} added to cart!`);
     setTimeout(() => setNotification(""), 3000);
   };
+
+  if (!isAuthenticated) {
+    navigate("/signin", { state: { from: `/product/${id}` } });
+    return;
+  }
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -197,29 +105,25 @@ export default function ProductDetail() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Image */}
-        {/* <div className="bg-white rounded-lg shadow-md overflow-hidden"> */}
+        {/* Product Images */}
         <ImageCarousel
-          images={[product.image]}
-          title={product.title}
+          images={product.imagesUrls}
+          title={product.name}
           containerClassName="bg-white rounded-lg shadow-md overflow-hidden"
           imageContainerClassName="w-full h-96 relative"
         />
-        {/* </div> */}
 
         {/* Product Details */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {product.title}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
             <div className="flex items-center mt-2">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`w-5 h-5 ${
-                      i < Math.floor(product.rating)
+                      i < 4 // Default rating since not in API
                         ? "text-yellow-400 fill-current"
                         : "text-gray-300"
                     }`}
@@ -227,13 +131,13 @@ export default function ProductDetail() {
                 ))}
               </div>
               <span className="ml-2 text-gray-600">
-                {product.rating} ({product.reviews} reviews)
+                4.5 (50 reviews) {/* Default values since not in API */}
               </span>
             </div>
           </div>
 
           <p className="text-2xl font-bold text-[#2E8B57]">
-            ₵{product.price.toFixed(2)}
+            {product.currency} {product.price}
           </p>
 
           <p className="text-gray-600">{product.description}</p>
@@ -257,10 +161,17 @@ export default function ProductDetail() {
 
             <button
               onClick={handleAddToCart}
-              className="flex-1 bg-[#2E8B57] text-white px-6 py-3 rounded-md hover:bg-[#256F3A] transition-colors flex items-center justify-center"
+              disabled={!product.isActive || product.stockQuantity < 1}
+              className={`flex-1 bg-primary-btn text-white px-6 py-3 rounded-md hover:bg-primary-btn-hover transition-colors flex items-center justify-center ${
+                !product.isActive || product.stockQuantity < 1
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
             >
               <ShoppingCart className="w-5 h-5 mr-2" />
-              Add to Cart
+              {!product.isActive || product.stockQuantity < 1
+                ? "Out of Stock"
+                : "Add to Cart"}
             </button>
           </div>
 
@@ -278,8 +189,16 @@ export default function ProductDetail() {
               </li>
               <li>
                 <span className="font-medium">Availability:</span>{" "}
-                {product.inStock ? "In Stock" : "Out of Stock"}
+                {product.isActive && product.stockQuantity > 0
+                  ? `In Stock (${product.stockQuantity} available)`
+                  : "Out of Stock"}
               </li>
+              {product.createdAt && (
+                <li>
+                  <span className="font-medium">Listed:</span>{" "}
+                  {new Date(product.createdAt).toLocaleDateString()}
+                </li>
+              )}
             </ul>
           </div>
         </div>

@@ -5,7 +5,8 @@ let accessToken = "";
 let refreshToken = "";
 let user = {} as LoginResponse;
 
-export const getAccessToken = () => accessToken;
+// export const getAccessToken = () => accessToken;
+export const getAccessToken = () => localStorage.getItem("accessToken");
 export const getRefreshToken = () => refreshToken;
 export const getUser = () => user;
 

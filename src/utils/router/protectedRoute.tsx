@@ -1,13 +1,19 @@
 // components/PrivateRoute.jsx
-import React, { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
-// import { ReactNode } from "react";
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
-const PrivateRoute = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth(); // Assuming `user` is null or undefined if not authenticated
+const PrivateRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { user, isAuthenticated } = useAuth(); // Assuming `user` is null or undefined if not authenticated
+  const location = useLocation();
 
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" state={{ from: location }} replace />;
+  }
   return user ? children : <Navigate to="/signin" replace />;
 };
 

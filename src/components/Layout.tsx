@@ -1,6 +1,6 @@
 import NotFound from "@/pages/404";
 import routerConfig from "@/utils/router";
-import PrivateRoute from "@/utils/router/ProtectedRoute";
+import PrivateRoute from "@/utils/router/protectedRoute";
 import React from "react";
 import { useLocation, Routes, Route } from "react-router-dom";
 import AppLoader from "./AppLoader";
@@ -9,7 +9,7 @@ import Navbar from "./Navbar";
 
 function LayoutHandler() {
   const location = useLocation();
-  const noLayoutRoutes = ["/signin", "/signup"];
+  const noLayoutRoutes = ["/signin", "/signup", "/password-reset"];
 
   const isNoLayout = noLayoutRoutes.includes(location.pathname);
 

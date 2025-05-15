@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 
-// Interfaces
 interface CartItem {
   id: string;
   title: string;
@@ -15,7 +14,7 @@ interface CartItem {
   quantity: number;
 }
 
-export interface CartState {
+interface CartState {
   cartItems: CartItem[];
 }
 
@@ -26,12 +25,10 @@ type CartAction =
   | { type: "RESET_CART" }
   | { type: "SET_CART"; payload: CartItem[] };
 
-// Initial state
 const initialState: CartState = {
   cartItems: [],
 };
 
-// Reducer
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM": {
@@ -59,19 +56,11 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         cartItems: state.cartItems.filter((item) => item.id !== action.payload),
       };
     case "UPDATE_QUANTITY":
-      if (action.payload.quantity < 1) {
-        return {
-          ...state,
-          cartItems: state.cartItems.filter(
-            (item) => item.id !== action.payload.id
-          ),
-        };
-      }
       return {
         ...state,
         cartItems: state.cartItems.map((item) =>
           item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
+            ? { ...item, quantity: Math.max(1, action.payload.quantity) }
             : item
         ),
       };
@@ -84,24 +73,31 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 };
 
-// Context
-export const CartContext = createContext<
-  | {
-      state: CartState;
-      dispatch: React.Dispatch<CartAction>;
-      totalPrice: number;
-    }
-  | undefined
->(undefined);
+interface CartContextType {
+  state: CartState;
+  dispatch: React.Dispatch<CartAction>;
+  totalPrice: number;
+  totalItems: number;
+}
 
-// Provider
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+export const CartProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
-      dispatch({ type: "SET_CART", payload: JSON.parse(savedCart) });
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        if (Array.isArray(parsedCart)) {
+          dispatch({ type: "SET_CART", payload: parsedCart });
+        }
+      } catch (error) {
+        console.error("Failed to parse cart data", error);
+      }
     }
   }, []);
 
@@ -114,14 +110,18 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     0
   );
 
+  const totalItems = state.cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   return (
-    <CartContext.Provider value={{ state, dispatch, totalPrice }}>
+    <CartContext.Provider value={{ state, dispatch, totalPrice, totalItems }}>
       {children}
     </CartContext.Provider>
   );
 };
 
-// Hook
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
