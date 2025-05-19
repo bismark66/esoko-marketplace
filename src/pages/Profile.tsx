@@ -267,6 +267,7 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
+    console.log("Logging out...");
     logout();
     navigate("/");
   };
