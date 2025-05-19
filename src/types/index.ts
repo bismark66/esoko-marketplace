@@ -80,8 +80,8 @@ export interface CreateUser {
 }
 
 export interface LoginResponse {
-  passwordChangedAt: string;
-  addresses: boolean;
+  // passwordChangedAt: string;
+  // addresses: boolean;
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
