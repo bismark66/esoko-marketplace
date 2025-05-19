@@ -8,10 +8,15 @@ interface ProtectedRouteProps {
 }
 
 const PrivateRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, isAuthenticated } = useAuth(); // Assuming `user` is null or undefined if not authenticated
+  const { user, isAuthenticated, isLoading } = useAuth(); // Assuming `user` is null or undefined if not authenticated
   const location = useLocation();
+  // const { isLoading } = useAuth();
 
-  if (!isAuthenticated) {
+  // if (isLoading) {
+  //   return <FullPageLoader />;
+  // }
+
+  if (!isAuthenticated && !isLoading) {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
   return user ? children : <Navigate to="/signin" replace />;
