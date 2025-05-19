@@ -19,7 +19,7 @@ import {
   AddAddressType,
   ProductDetails,
 } from "@/types";
-import { setAccessToken, setRefreshToken } from "@/utils/helpers";
+import { setAccessToken, setRefreshToken, setUser } from "@/utils/helpers";
 import { http } from "./httpInstance";
 
 export const authHandlers = {
@@ -45,14 +45,18 @@ export const authHandlers = {
   updateProfile: async (payload: UpdateUserType) =>
     await http.put("/shop/customers/me", payload),
   logout: async () => await http.post("/logout"),
-  refresh: async (): Promise<string> => {
-    const response = await http.post<{
-      accessToken: string;
-      refreshToken: string;
-    }>("/token/refresh");
-    const { refreshToken, accessToken } = response;
-    setRefreshToken(refreshToken);
-    return accessToken;
+  refresh: async (payload: { refreshToken: string }): Promise<unknown> => {
+    try {
+      const response = await http.post<{
+        accessToken: string;
+        refreshToken: string;
+      }>("/token/refresh", payload);
+      return response;
+    } catch (error) {
+      const apiError = error as ApiError;
+      console.error("Refresh token error:", apiError);
+      throw apiError;
+    }
   },
   register: async (payload: CreateUser): Promise<RegisterUserResponse> => {
     try {
@@ -71,7 +75,11 @@ export const authHandlers = {
   requestPasswordReset: async (payload: {
     email: string;
   }): Promise<requestPasswordResetResponse> => {
-    return await http.post("/auth/password/reset-request", payload);
+    return await http.post(
+      "/auth/password/reset-request",
+      JSON.stringify(payload),
+      { headers: { "Content-Type": "application/json" } }
+    );
   },
   resetPasswordOtp: async (
     payload: PasswordResetOtpType
