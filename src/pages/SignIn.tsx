@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { LogIn } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { LogIn } from "lucide-react";
 import { useLogin } from "@/utils/api/hooks";
-import { setAccessToken, getAccessToken, setUser } from "@/utils/helpers";
+import { setAccessToken, setRefreshToken, setUser } from "@/utils/helpers";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -12,11 +12,24 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, dispatch } = useAuth();
+  const { dispatch, isAuthenticated, isLoading } = useAuth();
   const { mutate, isPending, isError } = useLogin();
-  // const { dispatch } = useAuth();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const from = location.state?.from?.pathname || "/";
+
+  useEffect(() => {
+    console.log("states", isAuthenticated, !isLoading);
+    if (isAuthenticated && isLoading) {
+      navigate(from, { replace: true });
+    }
+    setIsCheckingAuth(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isLoading, from]);
+
+  if (isCheckingAuth) {
+    return null; // Or a loading spinner
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +41,7 @@ export default function SignIn() {
       {
         onSuccess: (data) => {
           setAccessToken(data.accessToken);
+          setRefreshToken(data.refreshToken);
           setUser(data);
           dispatch({ type: "LOGIN", payload: data });
           dispatch({ type: "SET_USER", payload: data.user });
