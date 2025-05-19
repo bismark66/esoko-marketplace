@@ -70,35 +70,61 @@ export default function OrderConfirmation() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Order Summary */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900">Order Summary</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Order Summary
+                </h2>
                 <div className="space-y-2">
-                  <p><span className="font-medium">Order Number:</span> {order.orderNumber}</p>
-                  <p><span className="font-medium">Date:</span> {new Date(order.date).toLocaleDateString()}</p>
-                  <p><span className="font-medium">Status:</span> <span className="capitalize">{order.status}</span></p>
+                  <p>
+                    <span className="font-medium">Order Number:</span>{" "}
+                    {order.orderNumber}
+                  </p>
+                  <p>
+                    <span className="font-medium">Date:</span>{" "}
+                    {new Date(order.date).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <span className="font-medium">Status:</span>{" "}
+                    <span className="capitalize">{order.status}</span>
+                  </p>
                 </div>
               </div>
 
               {/* Tracking Information */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900">Tracking Information</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Tracking Information
+                </h2>
                 <div className="space-y-2">
-                  <p><span className="font-medium">Tracking Number:</span> {order.trackingNumber}</p>
-                  <p><span className="font-medium">Estimated Delivery:</span> {new Date(order.estimatedDelivery).toLocaleDateString()}</p>
+                  <p>
+                    <span className="font-medium">Tracking Number:</span>{" "}
+                    {order.trackingNumber}
+                  </p>
+                  <p>
+                    <span className="font-medium">Estimated Delivery:</span>{" "}
+                    {new Date(order.estimatedDelivery).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Items */}
             <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Order Items
+              </h2>
               <div className="space-y-4">
                 {order.items.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center border-b pb-4">
+                  <div
+                    key={index}
+                    className="flex justify-between items-center border-b pb-4"
+                  >
                     <div>
                       <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">
+                        Quantity: {item.quantity}
+                      </p>
                     </div>
-                    <p className="font-medium">₵{item.price.toFixed(2)}</p>
+                    <p className="font-medium">₵{item.price}</p>
                   </div>
                 ))}
                 <div className="flex justify-between items-center pt-4 border-t">
@@ -110,24 +136,30 @@ export default function OrderConfirmation() {
 
             {/* Payment Information */}
             <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Payment Information
+              </h2>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex items-center mb-2">
-                  {order.paymentMethod === 'creditCard' ? (
+                  {order.paymentMethod === "creditCard" ? (
                     <CreditCard className="w-5 h-5 mr-2 text-gray-600" />
                   ) : (
                     <Package className="w-5 h-5 mr-2 text-gray-600" />
                   )}
-                  <p className="font-medium capitalize">{order.paymentMethod.replace(/([A-Z])/g, ' $1').trim()}</p>
+                  <p className="font-medium capitalize">
+                    {order.paymentMethod.replace(/([A-Z])/g, " $1").trim()}
+                  </p>
                 </div>
-                {order.paymentMethod === 'creditCard' && (
+                {order.paymentMethod === "creditCard" && (
                   <p className="text-sm text-gray-600">
-                    Card ending in {order.paymentDetails.creditCard?.cardNumber.slice(-4)}
+                    Card ending in{" "}
+                    {order.paymentDetails.creditCard?.cardNumber.slice(-4)}
                   </p>
                 )}
-                {order.paymentMethod === 'mobileMoney' && (
+                {order.paymentMethod === "mobileMoney" && (
                   <p className="text-sm text-gray-600">
-                    {order.paymentDetails.mobileMoney?.network} - {order.paymentDetails.mobileMoney?.phoneNumber}
+                    {order.paymentDetails.mobileMoney?.network} -{" "}
+                    {order.paymentDetails.mobileMoney?.phoneNumber}
                   </p>
                 )}
               </div>
@@ -136,14 +168,14 @@ export default function OrderConfirmation() {
             {/* Actions */}
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => navigate('/track-order')}
+                onClick={() => navigate("/track-order")}
                 className="flex-1 bg-[#2E8B57] text-white px-6 py-3 rounded-lg hover:bg-[#256F3A] transition-colors flex items-center justify-center"
               >
                 <Truck className="w-5 h-5 mr-2" />
                 Track Order
               </button>
               <button
-                onClick={() => navigate('/orders')}
+                onClick={() => navigate("/orders")}
                 className="flex-1 bg-white border border-[#2E8B57] text-[#2E8B57] px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 View All Orders
