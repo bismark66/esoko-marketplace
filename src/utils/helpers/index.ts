@@ -1,43 +1,40 @@
-import { LoginResponse, User } from "@/types";
+import { LoginResponse } from "@/types";
 
-// utils/api/token.ts
-let accessToken = "";
-let refreshToken = "";
-let user = {} as LoginResponse;
+export const getAccessToken = (): string | null => {
+  return localStorage.getItem("accessToken");
+};
 
-// export const getAccessToken = () => accessToken;
-export const getAccessToken = () => localStorage.getItem("accessToken");
-export const getRefreshToken = () => refreshToken;
-export const getUser = () => user;
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem("refreshToken");
+};
 
-export const setUser = (userData: LoginResponse) => {
-  user = userData;
+export const getUser = (): LoginResponse | null => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
+
+export const setUser = (userData: LoginResponse): void => {
   localStorage.setItem("user", JSON.stringify(userData));
 };
 
-export const setAccessToken = (token: string) => {
-  accessToken = token;
+export const setAccessToken = (token: string): void => {
   localStorage.setItem("accessToken", token);
 };
 
-export const setRefreshToken = (token: string) => {
-  refreshToken = token;
+export const setRefreshToken = (token: string): void => {
   localStorage.setItem("refreshToken", token);
 };
 
-export const loadTokensFromStorage = () => {
-  accessToken = localStorage.getItem("accessToken") || "";
-  refreshToken = localStorage.getItem("refreshToken") || "";
-  user = localStorage.getItem("user")
-    ? (JSON.parse(localStorage.getItem("user") as string) as LoginResponse)
-    : ({} as LoginResponse);
-};
-
-export const clearTokens = () => {
-  accessToken = "";
-  refreshToken = "";
-  user = {} as LoginResponse;
+export const clearTokens = (): void => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+  localStorage.removeItem("cart");
+};
+
+// Initialize auth state on app load
+export const initializeAuth = () => {
+  const token = getAccessToken();
+  const user = getUser();
+  return { token, user };
 };
