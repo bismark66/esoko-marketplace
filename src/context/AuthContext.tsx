@@ -1,4 +1,10 @@
-import { getAccessToken, getUser, setAccessToken } from "@/utils/helpers";
+import {
+  getAccessToken,
+  getUser,
+  setAccessToken,
+  initializeAuth,
+  clearTokens,
+} from "@/utils/helpers";
 import React, {
   createContext,
   useContext,
@@ -15,6 +21,7 @@ interface AuthContextType {
   logout: () => void;
   error?: string;
   dispatch: React.Dispatch<AuthAction>;
+  isLoading?: boolean;
 }
 
 type AuthAction =
@@ -22,18 +29,21 @@ type AuthAction =
   | { type: "LOGOUT" }
   | { type: "SET_ERROR"; payload: string }
   | { type: "CLEAR_ERROR" }
-  | { type: "SET_USER"; payload: User | null };
+  | { type: "SET_USER"; payload: User | null }
+  | { type: "SET_LOADING"; payload: boolean };
 
 const initialState: {
   isAuthenticated: boolean;
   user: LoginResponse | null;
   error?: string;
   userProfile: User | null;
+  isLoading: boolean;
 } = {
   isAuthenticated: false,
   user: null,
   error: undefined,
   userProfile: null,
+  isLoading: true,
 };
 
 const authReducer = (
@@ -61,6 +71,8 @@ const authReducer = (
       return { ...state, error: undefined };
     case "SET_USER":
       return { ...state, userProfile: action.payload };
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload };
     default:
       return state;
   }
@@ -72,28 +84,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const initializeAuth = () => {
+    const loadAuthState = () => {
       try {
-        const token = getAccessToken();
-        const user = getUser();
+        const { token, user } = initializeAuth();
 
         if (token && user) {
-          // First check if user is already a parsed object
-          let parsedUser: User;
-          if (typeof user === "string") {
-            parsedUser = JSON.parse(user);
-          } else if (typeof user === "object" && user !== null) {
-            parsedUser = user as User;
-          } else {
-            throw new Error("Invalid user data format");
-          }
-
-          if (parsedUser?.email) {
-            dispatch({ type: "LOGIN", payload: parsedUser });
-          }
+          dispatch({ type: "LOGIN", payload: user });
+          dispatch({ type: "SET_USER", payload: user.user });
+          console.log("after inactivity");
         }
       } catch (error) {
-        // Clear invalid stored data
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
         dispatch({
@@ -106,7 +106,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    initializeAuth();
+    // Add event listener for storage changes
+    window.addEventListener("storage", loadAuthState);
+    loadAuthState(); // Initial load
+
+    return () => {
+      window.removeEventListener("storage", loadAuthState);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -133,8 +139,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setAccessToken(data.accessToken);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      dispatch({ type: "LOGIN", payload: data.user });
+      localStorage.setItem("user", JSON.stringify(data));
+      dispatch({ type: "LOGIN", payload: data });
     } catch (error) {
       console.error("Login error:", error);
       dispatch({
@@ -146,9 +152,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("cart");
+    clearTokens();
     dispatch({ type: "LOGOUT" });
   };
 
@@ -161,6 +165,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         error: state.error,
         dispatch,
+        isLoading: state.isLoading,
       }}
     >
       {children}
@@ -168,6 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
